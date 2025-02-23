@@ -34,6 +34,13 @@ def verdict(sv='.minecraft'):
     with open(pj(sv,'version.json'),'w') as f:
         f.write(dumps(v))
     return v
+def setmem(opt):
+    s=input('1.自定义/2.自动分配',['1','2'])
+    if s=='1':
+        b='M' if input('1.mb/2.gb',['1','2'])=='1' else 'G'
+        c=str(input('大小:',typ=int))
+        opt["jvmArguments"]=['-Xmx'+c+b,'-Xms'+c+b]
+    return opt
 def runmc(ver,vdc,javaw,d='.minecraft',o=None,bqthread=128,out=None):
     print('正在补全文件...')
     dc=readv(ver)

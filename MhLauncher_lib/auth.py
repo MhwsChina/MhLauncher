@@ -6,6 +6,7 @@ from json import loads
 from json import dumps
 import webbrowser#打开网页
 
+
 def OAuth():
     webbrowser.open("https://login.live.com/oauth20_authorize.srf\
  ?client_id=00000000402b5328\
@@ -33,7 +34,6 @@ def OAuth():
     res = post(url=url, data=data, headers=header)
     dic = loads(res.text)
     access_token = dic["access_token"]
-
     '''
 
     XBox Live 身份验证
@@ -94,7 +94,6 @@ def OAuth():
     res = post(url=url, data=data)
     dic = loads(res.text)
     jwt = dic["access_token"]#jwt token,也就是Minecraft访问令牌
-
     header = {
         "Authorization": "Bearer " + jwt
     }
