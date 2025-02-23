@@ -46,8 +46,8 @@ def runmc(ver,vdc,javaw,d='.minecraft',o=None,bqthread=128,out=None):
     cmd[0]=javaw
     try:cmd=cmd[0:cmd.index('--quickPlayPath')]
     except:pass
-    '''try:cmd[cmd.index('--versionType')+1]='MhLauncher'
-    except:pass'''
+    try:cmd[cmd.index('--versionType')+1]='MhLauncher'
+    except:pass
     for i in range(len(cmd)):
         cmd[i]=cmd[i].replace('\\','/')
     if out:
@@ -70,9 +70,9 @@ def bqwj(ver,vdc,di,thread):
     for i in range(len(us)):
         u,p,s=us[i],ps[i],sha1[i]
         if not exists(p):uss.append(u);pss.append(p)
-        else:
+        '''else:
             if s=='SHABI':continue
-            if ghash(p)!=s:uss.append(u);pss.append(p)
+            if ghash(p)!=s:uss.append(u);pss.append(p)'''
     for i in range(len(uu)):
         u,p=uu[i],pp[i]
         if not exists(p):uss.append(u);pss.append(p)
