@@ -10,6 +10,7 @@ def getuuid(username):
                 if i['name']==username:return i['uuid']
     return '00000FFFFFFFFFFFFFFFFFFFFFFE5CC6'
 def init():
+    if not exists('mhl'):os.mkdir('mhl')
     if not exists('mhl/options.json'):dic=fdic()
     else:
         with open('mhl/options.json') as f:
@@ -23,12 +24,12 @@ def fdic(dic={}):
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
-            dic[c]=k
             if c=='opt':
-                dic[c]=={}
+                dic['opt']={}
                 dic['opt']['username']=input('请输入游戏名:')
                 dic['opt']['uuid']=getuuid(dic['opt']['username'])
                 dic['opt']['token']='00000FFFFFFFFFFFFFFFFFFFFFFE5CC6'
+            else: dic[c]=k
     return dic
 def upopt(opt):
     with open('mhl/options.json','w') as f:
