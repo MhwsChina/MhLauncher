@@ -134,6 +134,7 @@ v0.0.4
 支持查看协议
 优化兼容性
 补全文件更加快速
+优化自动更新
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -145,7 +146,7 @@ print('完成!')
 if opt['check_update']:
     print('正在检查更新')
     try:check_update(version,'mhl')
-    except:print('失败')
+    except:raise;print('失败')
 while True:
     if not exists('.minecraft'):os.mkdir('.minecraft')
     clear()
