@@ -1,5 +1,6 @@
 from MhLauncher_lib import *
 import os,sys
+import webbrowser as wb
 from json import dumps,loads
 def getuuid(username):
     if exists('.minecraft/usercache.json'):
@@ -111,6 +112,8 @@ s2='''
 3.自定义皮肤
 4.自动安装java
 5.自动检查更新设置
+6.查看本程序源代码(github)
+7.查看本程序协议
 -1.返回
 -2.查看更新日志
 '''[1:-1]
@@ -206,6 +209,11 @@ while True:
             if c=='y':opt['check_update']=1
             else:opt['check_update']=0
             upopt(opt)
+        if b=='6':
+            wb.open('https://github.com/MhwsChina/MhLauncher')
         if b=='-2':
             print(s3)
+            pause()
+        if b=='7':
+            show_license()
             pause()
