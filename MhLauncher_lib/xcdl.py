@@ -4,6 +4,8 @@ import os,random
 from sys import stdout
 from time import sleep
 f,th,us,ps,rands,t=0,0,[],[],[],False
+def pj(a,b):
+    return os.path.join(a,b).replace('\\','/')
 def qp(n, chuck):
     rs=[]
     if n<chuck:return [[i,i] for i in range(n)]
@@ -15,6 +17,8 @@ def qp(n, chuck):
         if c>n:c=n
         rs.append((tmp,c))
     return rs
+def exists(p):
+    return os.path.exists(p)
 def dnld(url,path,timeout=2):
     try:
         res=rq.get(url,timeout=timeout)
