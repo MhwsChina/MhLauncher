@@ -91,7 +91,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.4'
+'''[1:-1],'v0.0.5'
 s='''
 1.下载游戏
 2.启动游戏
@@ -114,6 +114,7 @@ s2='''
 5.自动检查更新设置
 6.查看本程序源代码(github)
 7.查看本程序协议
+8.设置游戏运行内存
 -1.返回
 -2.查看更新日志
 '''[1:-1]
@@ -135,6 +136,9 @@ v0.0.4
 优化兼容性
 补全文件更加快速
 优化自动更新
+v0.0.5
+修复了一些bug
+增添自定义游戏运行内存功能
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -196,14 +200,14 @@ while True:
             url=input('皮肤网址(输-1返回):')
             if url=='-1':continue
             typ=input('皮肤类型:(steve/alex)',['steve','alex']).upper()
-            s={'skins':[{
+            ssk={'skins':[{
                 'id':'nul',
                 'state':'ACTIVE',
                 'url':url,
                 'variant':'CLASSIC',
                 'alias':typ
                 }]}
-            opt['opt']=opt['opt'].update(s)
+            opt['opt']=opt['opt'].update(ssk)
             upopt(opt)
         if b=='4':
             c=input('请输入Java版本(8/16/17/21)(输入-1返回):',['8','16','17','21','-1'])
@@ -223,3 +227,6 @@ while True:
         if b=='7':
             show_license()
             pause()
+        if b=='8':
+            opt['opt']=setmem(opt['opt'])
+            upopt(opt)
