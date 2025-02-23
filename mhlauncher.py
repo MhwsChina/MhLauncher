@@ -9,22 +9,26 @@ def getuuid(username):
                 if i['name']==username:return i['uuid']
     return '00000FFFFFFFFFFFFFFFFFFFFFFE5CC6'
 def init():
-    if not exists('mhl/options.json'):dic=new()
+    if not exists('mhl/options.json'):dic=fdic()
     else:
         with open('mhl/options.json') as f:
             dic=loads(f.read())
+    dic=fdic(dic)
     upopt(dic)
     return dic
-def new():
-    dic={}
-    dic['opt']={}
-    dic['opt']['username']=input('请输入游戏名:')
-    dic['opt']['uuid']=getuuid(dic['opt']['username'])
-    dic['opt']['token']='00000FFFFFFFFFFFFFFFFFFFFFFE5CC6'
-    dic['thread']=128
+def fdic(dic={}):
+    ch=['opt','thread','check_update']
+    ck=[0,128,1]
+    for i in range(len(ch)):
+        c,k=ch[i],ck[i]
+        if not c in dic:
+            dic[c]=k
+            if c=='opt':
+                dic[c]=={}
+                dic['opt']['username']=input('请输入游戏名:')
+                dic['opt']['uuid']=getuuid(dic['opt']['username'])
+                dic['opt']['token']='00000FFFFFFFFFFFFFFFFFFFFFFE5CC6'
     return dic
-    with open('mhl/options.json','w') as f:
-        f.write(dumps(dic))
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
@@ -86,7 +90,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.2'
+'''[1:-1],'v0.0.3'
 s='''
 1.下载游戏
 2.启动游戏
@@ -106,14 +110,34 @@ s2='''
 2.设置下载线程
 3.自定义皮肤
 4.自动安装java
+5.自动检查更新设置
 -1.返回
+-2.查看更新日志
 '''[1:-1]
-print('正在获取版本列表...')
-vdc=verdict(sv='mhl')
-print('完成!')
+s3='''
+=======更新日志=======
+v0.0.1
+支持启动mc,下载mc
+v0.0.2
+加入多线程下载引擎
+自定义皮肤
+自动安装java
+导出启动脚本
+v0.0.3
+解决无法在无网络下启动mc的问题
+增加自动更新
+'''[1:-1]
 print('正在加载配置文件...')
 opt=init()
 print('完成!')
+if exists('OLD_LAUNCHER'):os.remove('OLD_LAUNCHER')
+print('正在获取版本列表...')
+vdc=verdict(sv='mhl')
+print('完成!')
+if opt['check_update']:
+    print('正在检查更新')
+    try:check_update(version,'mhl')
+    except:print('失败')
 while True:
     if not exists('.minecraft'):os.mkdir('.minecraft')
     clear()
@@ -176,3 +200,12 @@ while True:
             c=input('请输入Java版本(8/16/17/21)(输入-1返回):',['8','16','17','21','-1'])
             if c=='-1':continue
             downjava(c,'./mhl/java','./mhl')
+        if b=='5':
+            print('是否在程序启动时检查更新?')
+            c=input('(输入y表示是,输入n表示否)',['n','y'])
+            if c=='y':opt['check_update']=1
+            else:opt['check_update']=0
+            upopt(opt)
+        if b=='-2':
+            print(s3)
+            pause()
