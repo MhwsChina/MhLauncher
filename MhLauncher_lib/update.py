@@ -1,6 +1,6 @@
 import requests as req
 from json import loads
-import sys,os
+import sys,os,shutil
 from .xcdl import *
 from .log import *
 def check_update(now_version,save_path='',write_path=sys.argv[0],api_url='https://api.github.com/repos/MhwsChina/MhLauncher/tags',dlurl='https://gh.llkk.cc/https://github.com/MhwsChina/MhLauncher/releases/download/%tagver%/Launcher.exe',timeout=10):
@@ -14,7 +14,7 @@ def check_update(now_version,save_path='',write_path=sys.argv[0],api_url='https:
         s=input('发现新版本,是否更新?(输入y表示确认更新)')
         if s!='y':return
         onednld(dlurl.replace('%tagver%',latest['name']),p,r=rtor)
-        os.rename(sys.argv[0],'OLD_LAUNCHER')
+        shutil.move(sys.argv[0],pj(save_path,'OLD_LAUNCHER'))
         f=open(p,'rb')
         f1=open(sys.argv[0],'ab')
         f1.write(f.read())
