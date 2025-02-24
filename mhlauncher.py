@@ -81,7 +81,7 @@ def rmmc():
     try:n=int(input('输入要删除的序号'))
     except:print('输入有误');pause();return
     try:n=v[n]
-    except:
+    except:print('输入有误');pause();return
     n1=input(f'确定删除{n}?(y/n)')
     if n1=='y':removemc(n,vdc)
     else:print('已取消操作')
