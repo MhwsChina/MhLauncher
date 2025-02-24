@@ -41,12 +41,12 @@ def setmem(opt):
         c=str(input('大小:',typ=int))
         opt["jvmArguments"]=['-Xmx'+c+b,'-Xms'+c+b]
     return opt
-def runmc(ver,vdc,javaw,d='.minecraft',o=None,bqthread=128,out=None):
+def runmc(ver,vdc,javaw,d='.minecraft',o=None,bqthread=128,out=None,sha=0):
     print('正在补全文件...')
     dc=readv(ver)
     if 'inheritsFrom' in dc:
-        bqwj(dc['inheritsFrom'],vdc,d,bqthread)
-    bqwj(ver,vdc,d,bqthread)
+        bqwj(dc['inheritsFrom'],vdc,d,bqthread,sha)
+    bqwj(ver,vdc,d,bqthread,sha)
     print('完成!')
     if not o:o=mclib.utils.generate_test_options()
     cmd=mclib.command.get_minecraft_command(ver,d,o)
@@ -67,7 +67,7 @@ def runmc(ver,vdc,javaw,d='.minecraft',o=None,bqthread=128,out=None):
         th.Thread(target=sub.call,args=([cmd])).start()
         print('启动完成,游戏窗口等下会出现')
     pause()
-def bqwj(ver,vdc,di,thread):
+def bqwj(ver,vdc,di,thread,sha=0):
     f=pj(di,'versions/'+ver+'/'+ver+'.json')
     f=open(f,'r')
     d=loads(f.read())
@@ -77,9 +77,9 @@ def bqwj(ver,vdc,di,thread):
     for i in range(len(us)):
         u,p,s=us[i],ps[i],sha1[i]
         if not exists(p):uss.append(u);pss.append(p)
-        '''else:
+        if sha:
             if s=='SHABI':continue
-            if ghash(p)!=s:uss.append(u);pss.append(p)'''
+            if ghash(p)!=s:uss.append(u);pss.append(p)
     for i in range(len(uu)):
         u,p=uu[i],pp[i]
         if not exists(p):uss.append(u);pss.append(p)
