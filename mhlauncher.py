@@ -19,8 +19,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update']
-    ck=[0,128,1]
+    ch=['opt','thread','check_update','bqwj']
+    ck=[0,128,1,0]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -69,8 +69,8 @@ def qidong(out=None):
                 downjava(j,'./mhl/java','./mhl')
                 java=fjava(ls=['mhl/java'],t=1)[j]
             else:return
-        if out:runmc(v[n],vdc,java,o=opt['opt'],out=v[n]+'.bat',bqthread=opt['thread'])
-        else:runmc(v[n],vdc,java,o=opt['opt'],bqthread=opt['thread'])
+        if out:runmc(v[n],vdc,java,o=opt['opt'],out=v[n]+'.bat',bqthread=opt['thread'],sha=opt['bqwj'])
+        else:runmc(v[n],vdc,java,o=opt['opt'],bqthread=opt['thread'],sha=opt['bqwj'])
 def rmmc():
     v=allv()
     if v==[]:print('没有可删除版本');pause();return
@@ -92,7 +92,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.5'
+'''[1:-1],'v0.0.6'
 s='''
 1.下载游戏
 2.启动游戏
@@ -116,6 +116,7 @@ s2='''
 6.查看本程序源代码(github)
 7.查看本程序协议
 8.设置游戏运行内存
+9.补全文件设置
 -1.返回
 -2.查看更新日志
 '''[1:-1]
@@ -140,6 +141,8 @@ v0.0.4
 v0.0.5
 修复了一些bug
 增添自定义游戏运行内存功能
+v0.0.6
+补全文件更新
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -222,6 +225,11 @@ while True:
             upopt(opt)
         if b=='6':
             wb.open('https://github.com/MhwsChina/MhLauncher')
+        if b=='9':
+            c=input('1.快速模式(但不全面)/2.全面模式(但不快速)/3.返回',['1','2','3'])
+            if c=='1':opt['bqwj']=0
+            if c=='2':opt['bqwj']=1
+            upopt(opt)
         if b=='-2':
             print(s3)
             pause()
