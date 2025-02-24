@@ -142,12 +142,13 @@ v0.0.5
 修复了一些bug
 增添自定义游戏运行内存功能
 v0.0.6
+优化自动更新
 补全文件更新
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
 print('完成!')
-if exists('OLD_LAUNCHER'):os.remove('OLD_LAUNCHER')
+if exists('mhl/OLD_LAUNCHER'):os.remove('mhl/OLD_LAUNCHER')
 print('正在获取版本列表...')
 vdc=verdict(sv='mhl')
 print('完成!')
