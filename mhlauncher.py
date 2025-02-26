@@ -19,8 +19,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj']
-    ck=[0,128,1,0]
+    ch=['opt','thread','check_update','bqwj','dlout']
+    ck=[0,128,1,0,0]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -69,8 +69,8 @@ def qidong(out=None):
                 downjava(j,'./mhl/java','./mhl')
                 java=fjava(ls=['mhl/java'],t=1)[j]
             else:return
-        if out:runmc(v[n],vdc,java,o=opt['opt'],out=v[n]+'.bat',bqthread=opt['thread'],sha=opt['bqwj'])
-        else:runmc(v[n],vdc,java,o=opt['opt'],bqthread=opt['thread'],sha=opt['bqwj'])
+        if out:runmc(v[n],vdc,java,opt['opt'],v[n]+'.bat',opt['thread'],opt['bqwj'],opt['dlout'])
+        else:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'])
 def rmmc():
     v=allv()
     if v==[]:print('没有可删除版本');pause();return
@@ -93,7 +93,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.6'
+'''[1:-1],'v0.0.7'
 s='''
 1.下载游戏
 2.启动游戏
@@ -118,6 +118,7 @@ s2='''
 7.查看本程序协议
 8.设置游戏运行内存
 9.补全文件设置
+10.多线程下载输出设置
 -1.返回
 -2.查看更新日志
 '''[1:-1]
@@ -145,6 +146,8 @@ v0.0.5
 v0.0.6
 优化自动更新
 补全文件更新
+v0.0.7
+优化多线程下载
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -174,7 +177,7 @@ while True:
         if b=='4':
             ver=input('游戏版本:')
             if ver=='':continue
-            try:downloadmc(ver,vdc,thread=opt['thread'])
+            try:downloadmc(ver,vdc,opt['thread'],opt['dlout'])
             except:print('下载失败');pause()
         if b=='3':
             print('1.正式版\n2.测试版\n3.远古alpha版\n4.远古beta版')
@@ -187,10 +190,10 @@ while True:
             pause()
             continue
         if b=='2':
-            try:downloadmc(ov(vdc,'snapshot',1),vdc,thread=opt['thread'])
+            try:downloadmc(ov(vdc,'snapshot',1),vdc,opt['thread'],opt['dlout'])
             except:print('下载失败');pause()
         if b=='1':
-            try:downloadmc(ov(vdc,'release',1),vdc,thread=opt['thread'])
+            try:downloadmc(ov(vdc,'release',1),vdc,opt['thread'],opt['dlout'])
             except:print('下载失败');pause()
     if a=='3':qidong(True)
     if a=='4':rmmc()
@@ -221,16 +224,22 @@ while True:
             downjava(c,'./mhl/java','./mhl')
         if b=='5':
             print('是否在程序启动时检查更新?')
-            c=input('(输入y表示是,输入n表示否)',['n','y'])
+            c=input('(输入y表示是,输入n表示否,默认为是)',['n','y'])
             if c=='y':opt['check_update']=1
             else:opt['check_update']=0
             upopt(opt)
         if b=='6':
             wb.open('https://github.com/MhwsChina/MhLauncher')
         if b=='9':
-            c=input('1.快速模式(但不全面)/2.全面模式(但不快速)/3.返回',['1','2','3'])
+            c=input('1.快速模式(但不全面)(默认)/2.全面模式(但不快速)/3.返回',['1','2','3'])
             if c=='1':opt['bqwj']=0
             if c=='2':opt['bqwj']=1
+            upopt(opt)
+        if b=='10':
+            print('是否在下载时显示下载的文件?')
+            c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
+            if c=='y':opt['dlout']=1
+            else:opt['dlout']=0
             upopt(opt)
         if b=='-2':
             print(s3)
