@@ -92,12 +92,12 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
         if bq:sha1s.append(obj['hash'])
     if bq:return us,ps,uu,pp,sha1s
     return us,ps,uu,pp
-def downloadmc(ver,vdc,d='.minecraft',bm=False,thread=128):
+def downloadmc(ver,vdc,thread=128,dlout=0,bm=False,d='.minecraft'):
     urls,paths,uu,pp=gtmcurl(ver,vdc,d,bm)
     print('开始下载',ver)
     print('开始下载资源文件')
-    xcdnld(urls,paths,thread)
+    xcdnld(urls,paths,thread,dlout)
     print('开始下载主文件')
-    xcdnld(uu,pp,thread)
+    xcdnld(uu,pp,thread,dlout)
     print(ver,'下载完成')
     pause()

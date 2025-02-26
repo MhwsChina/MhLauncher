@@ -41,12 +41,12 @@ def setmem(opt):
         c=str(input('大小:',typ=int))
         opt["jvmArguments"]=['-Xmx'+c+b,'-Xms'+c+b]
     return opt
-def runmc(ver,vdc,javaw,d='.minecraft',o=None,bqthread=128,out=None,sha=0):
+def runmc(ver,vdc,javaw,o=None,bqthread=128,out=None,sha=0,dlout=0,d='.minecraft'):
     print('正在补全文件...')
     dc=readv(ver)
     if 'inheritsFrom' in dc:
-        bqwj(dc['inheritsFrom'],vdc,d,bqthread,sha)
-    bqwj(ver,vdc,d,bqthread,sha)
+        bqwj(dc['inheritsFrom'],vdc,d,bqthread,sha,dlout)
+    bqwj(ver,vdc,d,bqthread,sha,dlout)
     print('完成!')
     if not o:o=mclib.utils.generate_test_options()
     cmd=mclib.command.get_minecraft_command(ver,d,o)
@@ -67,7 +67,7 @@ def runmc(ver,vdc,javaw,d='.minecraft',o=None,bqthread=128,out=None,sha=0):
         th.Thread(target=sub.call,args=([cmd])).start()
         print('启动完成,游戏窗口等下会出现')
     pause()
-def bqwj(ver,vdc,di,thread,sha=0):
+def bqwj(ver,vdc,di,thread,sha=0,out=0):
     f=pj(di,'versions/'+ver+'/'+ver+'.json')
     f=open(f,'r')
     d=loads(f.read())
@@ -83,7 +83,7 @@ def bqwj(ver,vdc,di,thread,sha=0):
     for i in range(len(uu)):
         u,p=uu[i],pp[i]
         if not exists(p):uss.append(u);pss.append(p)
-    if not uss==[]:xcdnld(uss,pss,thread)
+    if not uss==[]:xcdnld(uss,pss,thread,out)
     for l in d['libraries']:
         if 'downloads' not in l:continue
         if 'classifiers' in l['downloads']:

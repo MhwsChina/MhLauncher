@@ -48,7 +48,7 @@ def onednld(url,path,timeout=2,chunk_size=1048576,r=None):
         raise
         onednld(url,path,timeout,chunk_size,r)
     print()
-def dnlds():
+def dnlds(out=False):
     global f,th,us,ps,rands,t
     while len(us)>0:
         while t:sleep(0.000001)
@@ -56,13 +56,13 @@ def dnlds():
         u=us.pop(0)
         p=ps.pop(0)
         t=False
-        stdout.write(f'\r下载 {p}{40*" "}\n')
+        if out:stdout.write(f'\r下载 {p}{40*" "}\n')
         try:
             dnld(u,p)
             f+=1
         except:f-=1
     th+=1
-def xcdnld(urls,paths,thread):
+def xcdnld(urls,paths,thread,out=False):
     global us,ps,f,th
     th,f=0,0
     us=urls
@@ -70,7 +70,7 @@ def xcdnld(urls,paths,thread):
     f1=len(urls)
     ls=qp(f1,thread)
     for i in range(thread):
-        thd.Thread(target=dnlds).start()
+        thd.Thread(target=dnlds,args=(out,)).start()
         sleep(0.01)
     jdt=50
     while True:
