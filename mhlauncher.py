@@ -1,5 +1,5 @@
 from MhLauncher_lib import *
-import os,sys
+import os,sys,uuid
 import webbrowser as wb
 from json import dumps,loads
 def getuuid(username):
@@ -8,7 +8,7 @@ def getuuid(username):
             v=loads(f.read())
             for i in v:
                 if i['name']==username:return i['uuid']
-    return '00000FFFFFFFFFFFFFFFFFFFFFFE5CC6'
+    return str(uuid.uuid4())
 def init():
     if not exists('mhl'):os.mkdir('mhl')
     if not exists('mhl/options.json'):dic=fdic()
@@ -19,8 +19,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','dlout']
-    ck=[0,128,1,0,0]
+    ch=['opt','thread','check_update','bqwj','dlout','marg']
+    ck=[0,128,1,0,0,[]]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -28,7 +28,7 @@ def fdic(dic={}):
                 dic['opt']={}
                 dic['opt']['username']=input('请输入游戏名:')
                 dic['opt']['uuid']=getuuid(dic['opt']['username'])
-                dic['opt']['token']='00000FFFFFFFFFFFFFFFFFFFFFFE5CC6'
+                dic['opt']['token']=dic['opt']['uuid']
             else: dic[c]=k
     return dic
 def upopt(opt):
@@ -69,8 +69,8 @@ def qidong(out=None):
                 downjava(j,'./mhl/java','./mhl')
                 java=fjava(ls=['mhl/java'],t=1)[j]
             else:return
-        if out:runmc(v[n],vdc,java,opt['opt'],v[n]+'.bat',opt['thread'],opt['bqwj'],opt['dlout'])
-        else:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'])
+        if out:runmc(v[n],vdc,java,opt['opt'],opt['thread'],v[n]+'.bat',opt['bqwj'],opt['dlout'],opt['marg'])
+        else:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'])
 def rmmc():
     v=allv()
     if v==[]:print('没有可删除版本');pause();return
@@ -93,7 +93,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.7'
+'''[1:-1],'v0.0.8'
 s='''
 1.下载游戏
 2.启动游戏
@@ -148,6 +148,12 @@ v0.0.6
 补全文件更新
 v0.0.7
 优化多线程下载
+v0.0.8
+支持启动fabric,forge
+重构,重写启动游戏代码(花了好长时间)
+重写导出启动脚本代码
+不再需要minecraft-launcher-lib
+优化检测java代码
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -248,5 +254,5 @@ while True:
             show_license()
             pause()
         if b=='8':
-            opt['opt']=setmem(opt['opt'])
+            opt['marg']=setmem()
             upopt(opt)
