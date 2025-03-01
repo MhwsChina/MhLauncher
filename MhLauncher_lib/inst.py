@@ -3,8 +3,8 @@ from json import loads
 from .xcdl import *
 from .log import *
 import os
-def pj(a,b):
-    return os.path.join(a,b).replace('\\','/')
+def pj(*args):
+    return os.path.join(*args).replace('\\','/')
 def gt(urls,timeout=10):
     for i in urls:
         try:return rq.get(i,timeout=timeout).text

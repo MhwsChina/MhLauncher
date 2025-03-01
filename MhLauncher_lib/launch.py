@@ -1,10 +1,10 @@
 from .inst import *
 from .xcdl import *
+from .args import *
 from json import loads,dumps
 import subprocess as sub
-import os,zipfile,hashlib
+import os,zipfile,hashlib,uuid,random
 import threading as th
-import minecraft_launcher_lib as mclib
 import shutil as sht
 def unpress(fl,p,f=False):
     try:
@@ -15,6 +15,9 @@ def unpress(fl,p,f=False):
             if f:print('解压',z1)
         z.close()
     except:pass
+def testplayer():
+    rd=str(uuid.uuid4())
+    return {'username':f'Player{random.randint(100,9999)}','uuid':rd,'token':rd}
 def ghash(f,typ='sha1'):
     with open(f,'rb') as f:
         return hashlib.new(typ,f.read()).hexdigest()
@@ -39,24 +42,17 @@ def setmem(opt):
     if s=='1':
         b='M' if input('1.mb/2.gb',['1','2'])=='1' else 'G'
         c=str(input('大小:',typ=int))
-        opt["jvmArguments"]=['-Xmx'+c+b,'-Xms'+c+b]
-    return opt
-def runmc(ver,vdc,javaw,o=None,bqthread=128,out=None,sha=0,dlout=0,d='.minecraft'):
+        return ['-Xmx'+c+b,'-Xmn'+c+b]
+    return []
+def runmc(ver,vdc,javaw,o=None,bqthread=128,out=None,sha=0,dlout=0,marg=[],d='.minecraft'):
     print('正在补全文件...')
     dc=readv(ver)
     if 'inheritsFrom' in dc:
         bqwj(dc['inheritsFrom'],vdc,d,bqthread,sha,dlout)
     bqwj(ver,vdc,d,bqthread,sha,dlout)
     print('完成!')
-    if not o:o=mclib.utils.generate_test_options()
-    cmd=mclib.command.get_minecraft_command(ver,d,o)
-    cmd[0]=javaw
-    try:cmd=cmd[0:cmd.index('--quickPlayPath')]
-    except:pass
-    try:cmd[cmd.index('--versionType')+1]='MhLauncher'
-    except:pass
-    for i in range(len(cmd)):
-        cmd[i]=cmd[i].replace('\\','/')
+    if not o:o=testplayer()
+    cmd=getmcargs(ver,javaw,o,marg,d)
     if out:
         cmd[0]='"{}"'.format(cmd[0].replace('"',''))
         with open(out,'w',encoding='utf-8') as f:
@@ -146,7 +142,8 @@ def indexv(v,vd):
     return dc
 def mcjava(v,vd,d='.minecraft'):
     dc=readv(v)
-    if 'id' in dc:v=dc['id']
+    if 'inheritsFrom' in dc:dc=readv(dc['inheritsFrom'])
+    """if 'id' in dc:v=dc['id']
     if 'inheritsFrom' in dc:v=dc['inheritsFrom']
     dc=indexv(v,vd)
     mvv=dc['v']
@@ -159,7 +156,8 @@ def mcjava(v,vd,d='.minecraft'):
         if mvv[0]>=0 and mvv[0]<dc['16']:return '8'
         if mvv[0]>=dc['16'] and mvv[0]<dc['17']:return '16'
         if mvv[0]>=dc['17'] and mvv[0]<dc['21']:return '17'
-        if mvv[0]>=dc['21']:return '21'
+        if mvv[0]>=dc['21']:return '21'"""
+    return str(dc['javaVersion']['majorVersion'])
 def removemc(ver,vdc,d='.minecraft'):
     us,ps,uu,pp=gtmcurl(ver,vdc)
     for i in ps:
