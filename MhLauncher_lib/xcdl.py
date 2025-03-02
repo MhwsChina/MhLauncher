@@ -69,6 +69,7 @@ def xcdnld(urls,paths,thread,out=False):
     ps=paths
     f1=len(urls)
     ls=qp(f1,thread)
+    if f1<thread:thread=f1
     for i in range(thread):
         thd.Thread(target=dnlds,args=(out,)).start()
         sleep(0.01)
