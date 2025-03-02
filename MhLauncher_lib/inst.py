@@ -48,7 +48,7 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
         if 'downloads' not in lib:
             p,n,v=lib['name'].split(':')
             p=p.replace('.','/')
-            f=f'{p}/{n}/{n}-{v}.jar'
+            f=f'{p}/{n}/{v}/{n}-{v}.jar'
             path=pj(d,f'libraries/{f}')
             url=lib['url']+f
             us.append(url);ps.append(path)
