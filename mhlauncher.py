@@ -19,8 +19,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','dlout','marg']
-    ck=[0,128,1,0,0,[]]
+    ch=['opt','thread','check_update','bqwj','dlout','marg','outlog']
+    ck=[0,128,1,0,0,[],0]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -38,9 +38,7 @@ def qidong(out=None):
     v=allv()
     if v==[]:print('没有可用版本,请先下载');pause();return
     j=0
-    for i in v:
-        print(j,i)
-        j+=1
+    listprint(v,['序号','版本'])
     if out:
         try:n=int(input('输入要生成的序号'))
         except:return
@@ -69,8 +67,8 @@ def qidong(out=None):
                 downjava(j,'./mhl/java','./mhl')
                 java=fjava(ls=['mhl/java'],t=1)[j]
             else:return
-        if out:runmc(v[n],vdc,java,opt['opt'],opt['thread'],v[n]+'.bat',opt['bqwj'],opt['dlout'],opt['marg'])
-        else:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'])
+        if out:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'],opt['outlog'],v[n]+'.bat')
+        else:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'],opt['outlog'])
 def rmmc():
     v=allv()
     if v==[]:print('没有可删除版本');pause();return
@@ -93,7 +91,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.10'
+'''[1:-1],'v0.0.11'
 s='''
 1.下载游戏
 2.启动游戏
@@ -119,6 +117,7 @@ s2='''
 8.设置游戏运行内存
 9.补全文件设置
 10.多线程下载输出设置
+11.游戏日志输出设置
 -1.返回
 -2.查看更新日志
 '''[1:-1]
@@ -158,6 +157,8 @@ v0.0.9
 多线程下载修复了一个bug
 v0.0.10
 修复了一些bug
+v0.0.11
+修复了很多bug
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -190,15 +191,7 @@ while True:
             try:downloadmc(ver,vdc,opt['thread'],opt['dlout'])
             except:print('下载失败');pause()
         if b=='3':
-            print('1.正式版\n2.测试版\n3.远古alpha版\n4.远古beta版')
-            c=input('选择序号:')
-            if c=='1':t='release'
-            if c=='2':t='snapshot'
-            if c=='3':t='old_alpha'
-            if c=='4':t='old_beta'
-            for i in ov(vdc,t):print(i['id'])
-            pause()
-            continue
+            printvdc(vdc)
         if b=='2':
             try:downloadmc(ov(vdc,'snapshot',1),vdc,opt['thread'],opt['dlout'])
             except:print('下载失败');pause()
@@ -250,6 +243,12 @@ while True:
             c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
             if c=='y':opt['dlout']=1
             else:opt['dlout']=0
+            upopt(opt)
+        if b=='11':
+            print('是否在游戏运行时输出日志?')
+            c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
+            if c=='y':opt['outlog']=1
+            else:opt['outlog']=0
             upopt(opt)
         if b=='-2':
             print(s3)
