@@ -23,6 +23,29 @@ def ov(vdc,typ='release',lt=False,find=False):
         if find:
             if v['id']==typ:return v
     return vs
+def printvdc(vdc):
+    if vdc=={}:
+        print('无可用版本,请检查网络连接!')
+        pause()
+        return
+    print('1.正式版\n2.测试版\n3.远古alpha版\n4.远古beta版')
+    c=input('选择序号:')
+    if c=='1':t='release'
+    if c=='2':t='snapshot'
+    if c=='3':t='old_alpha'
+    if c=='4':t='old_beta'
+    o=ov(vdc,t)[::-1]
+    i,j=len(o),0
+    clear()
+    while i:
+        i-=1;j+=1
+        print('\r版本:',o[i]['id'],'发布时间:',o[i]['releaseTime'])
+        if j>=15:
+            j=0
+            tmp=input('1.下一页/2.返回',['1','2'])
+            if tmp=='2':return
+            print('\r'+20*' ',end='')
+    if j<15:pause()
 def readv(ver,d='.minecraft'):
     with open(pj(d,'versions/'+ver+'/'+ver+'.json'),'r') as f:
         return loads(f.read())
@@ -31,9 +54,13 @@ def readass(aid,d='.minecraft'):
         return loads(f.read())
 def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
     us,ps,uu,pp=[],[],[],[]
-    if bq:sha1s=[]
-    verurl=ov(vdc,ver,find=True)
-    if verurl!=[]:
+    if bq:sha1s=[];vdc=readv(ver)
+    else:
+        if vdc=={}:
+            print('下载失败:版本列表无法加载')
+            pause()
+            return
+        verurl=ov(vdc,ver,find=True)
         verurl=verurl['url']
         if bm:verurl=verurl.replace('piston-meta.mojang.com','bmclapi2.bangbang93.com')
         uu.append(verurl)
@@ -43,7 +70,6 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
         clienturl=f"https://bmclapi2.bangbang93.com/version/{ver}/client"
         uu.append(clienturl)
         pp.append(pj(d,'versions/'+ver+'/'+ver+'.jar'))
-    else:vdc=readv(ver)
     for lib in vdc['libraries']:
         if 'downloads' not in lib:
             tags=lib['name'].split(':')
@@ -82,21 +108,19 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
                 path=pj(d,"libraries/"+cl["path"])
                 us.append(url);ps.append(path)
                 if bq:sha1s.append(cl['sha1'])
-    try:assurl=vdc["assetIndex"]["url"]
-    except:
-        if bq:return us,ps,uu,pp,sha1s
-        return us,ps,uu,pp
-    if bm:assurl=assurl.replace("launcher.mojang.com","bmclapi2.bangbang93.com")
-    asspath=pj(d,'assets/indexes/'+vdc["assetIndex"]["id"]+'.json')
-    uu.append(assurl);pp.append(asspath)
-    try:assdc=loads(rq.get(assurl,timeout=10).text)
-    except:assdc=readass(vdc["assetIndex"]["id"])
-    for obj in assdc['objects'].values():
-        if bm:url=f"https://bmclapi2.bangbang93.com/assets/{obj['hash'][0:2]}/{obj['hash']}"
-        else:url=f"https://resources.download.minecraft.net/{obj['hash'][0:2]}/{obj['hash']}"
-        path=pj(d,f"assets/objects/{obj['hash'][0:2]}/{obj['hash']}")
-        us.append(url);ps.append(path)
-        if bq:sha1s.append(obj['hash'])
+    if 'assetIndex' in vdc:
+        assurl=vdc["assetIndex"]["url"]
+        if bm:assurl=assurl.replace("launcher.mojang.com","bmclapi2.bangbang93.com")
+        asspath=pj(d,'assets/indexes/'+vdc["assetIndex"]["id"]+'.json')
+        uu.append(assurl);pp.append(asspath)
+        if bq:assdc=readass(vdc["assetIndex"]["id"])
+        else:assdc=loads(rq.get(assurl,timeout=10).text)
+        for obj in assdc['objects'].values():
+            if bm:url=f"https://bmclapi2.bangbang93.com/assets/{obj['hash'][0:2]}/{obj['hash']}"
+            else:url=f"https://resources.download.minecraft.net/{obj['hash'][0:2]}/{obj['hash']}"
+            path=pj(d,f"assets/objects/{obj['hash'][0:2]}/{obj['hash']}")
+            us.append(url);ps.append(path)
+            if bq:sha1s.append(obj['hash'])
     if bq:return us,ps,uu,pp,sha1s
     return us,ps,uu,pp
 def downloadmc(ver,vdc,thread=128,dlout=0,bm=False,d='.minecraft'):

@@ -103,7 +103,7 @@ def getjvm(v,ver,classpath,opt,d):
     args=[]
     if 'inheritsFrom' in v:
         args=args+getjvm(readv(v['inheritsFrom'],d),ver,classpath,opt,d)
-    if 'arguments' in v:
+    elif 'arguments' in v:
         if 'jvm' in v['arguments']:
             for i in v['arguments']['jvm']:
                 if type(i)==str:
@@ -111,8 +111,10 @@ def getjvm(v,ver,classpath,opt,d):
                 else:
                     if 'rules' in i and not parsel(i['rules']):continue
                     args.append(i['value'])
-    if 'jvmArguments' in v:
+    elif 'jvmArguments' in v:
         args=args+v['jvmArguments']
+    else:
+        args.append('-Djava.library.path='+pj(d,f'versions/{ver}/natives'))
     if 'minecraftArguments' in v:
         args.append('-cp')
         args.append(classpath)
@@ -127,12 +129,11 @@ def getgame(v,ver,classpath,opt,d):
                if type(i)==str:
                    args.append(fmarg(i,ver,classpath,v,opt,d))
     if 'minecraftArguments' in v:
-        args.append(fmarg(v['minecraftArguments'],ver,classpath,v,opt,d))
+        args=args+fmarg(v['minecraftArguments'],ver,classpath,v,opt,d).split()
     return args
 def getmcargs(ver,java,opt,marg=[],d='.minecraft'):
     v=readv(ver,d)
     args=[java,'-XX:+UseG1GC','-XX:-UseAdaptiveSizePolicy','-XX:-OmitStackTraceInFastThrow']
-    args=[java]    
     if marg:args=args+marg
     classpath=getcp(ver,d=d)
     args=args+getjvm(v,ver,classpath,opt,d)

@@ -31,9 +31,8 @@ def verdict(sv='.minecraft'):
             with open(pj(sv,'version.json'),'r') as f:
                 return loads(f.read())
         else:
-            print('无法获取mc版本列表,程序即将关闭!')
-            pause()
-            raise
+            print('无法获取mc版本列表,无法进行下载游戏操作!')
+            return {}
     with open(pj(sv,'version.json'),'w') as f:
         f.write(dumps(v))
     return v
@@ -44,7 +43,7 @@ def setmem(opt):
         c=str(input('大小:',typ=int))
         return ['-Xmx'+c+b,'-Xmn'+c+b]
     return []
-def runmc(ver,vdc,javaw,o=None,bqthread=128,out=None,sha=0,dlout=0,marg=[],d='.minecraft'):
+def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,dlout=0,marg=[],outlog=False,out=None,d='.minecraft'):
     print('正在补全文件...')
     dc=readv(ver)
     if 'inheritsFrom' in dc:
@@ -52,6 +51,7 @@ def runmc(ver,vdc,javaw,o=None,bqthread=128,out=None,sha=0,dlout=0,marg=[],d='.m
     bqwj(ver,vdc,d,bqthread,sha,dlout)
     print('完成!')
     if not o:o=testplayer()
+    if outlog:javaw=javaw.replace('javaw','java')
     cmd=getmcargs(ver,javaw,o,marg,d)
     if out:
         cmd[0]='"{}"'.format(cmd[0].replace('"',''))
@@ -60,8 +60,10 @@ def runmc(ver,vdc,javaw,o=None,bqthread=128,out=None,sha=0,dlout=0,marg=[],d='.m
             print('导出启动脚本完成')
     else:
         print('正在启动',ver)
-        th.Thread(target=sub.call,args=([cmd])).start()
-        print('启动完成,游戏窗口等下会出现')
+        if outlog:sub.run(cmd)
+        else:
+            th.Thread(target=sub.run,args=([cmd])).start()
+            print('启动完成,游戏窗口等下会出现')
     pause()
 def bqwj(ver,vdc,di,thread,sha=0,out=0):
     f=pj(di,'versions/'+ver+'/'+ver+'.json')
@@ -104,9 +106,6 @@ def allv(d='.minecraft'):
     return ls
 def isv(i,d='.minecraft'):
     return exists(pj(d,'versions/'+i+'/'+i+'.json'))
-def clear():
-    if os.name=='nt':os.system('cls')
-    if os.name=='posix':os.system('clear')
 def isjavaf(java,find):
     pth=pj(java,f'bin/{find}')
     if exists(pth):
@@ -117,13 +116,15 @@ def isjavaf(java,find):
                     if '_' in ver:v=ver.split('.')[1]
                     else:v=ver.split('.')[0]
     return pth,v
-def fjava(find='javaw.exe',ls=['java'],t=False):
+def fjava(find='javaw.exe',ls=['java'],t=True):
     jv={}
     if t:ls.append(pj(os.path.expandvars("%APPDATA%"),'.minecraft/runtime'))
     for java in ls:
         if exists(java):
             for i in os.listdir(java):
-                pth,v=isjavaf(pj(java,i),find)
+                tmpp=pj(java,i)
+                if os.path.isfile(tmpp):continue
+                pth,v=isjavaf(tmpp,find)
                 jv[v]=pth
     return jv
 def indexv(v,vd):

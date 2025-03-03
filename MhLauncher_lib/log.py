@@ -1,4 +1,4 @@
-import sys,time
+import sys,time,os
 inputf=input
 def input(txt='',ls=[],typ=str,err='输入不正确,请重新输入!'):
     while True:
@@ -17,3 +17,18 @@ def log(txt,mode='INFO'):
     print(f'[{t} {mode}]: {txt}')
 def pause():
     return input('按Enter键继续...')
+def clear():
+    if os.name=='nt':os.system('cls')
+    if os.name=='posix':os.system('clear')
+def listprint(ls,fst=0):
+    l,j=len(str(len(ls))),0
+    if fst:
+        for i in fst:
+            print(i,end='')
+            if len(i)<l:
+                print((l-len(i))*' ',end='')
+            print(' ',end='')
+        print()
+    for i in ls:
+        print('{0:<{1}} {2}'.format(j,l,i))
+        j+=1
