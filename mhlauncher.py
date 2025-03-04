@@ -91,7 +91,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.11'
+'''[1:-1],'v0.0.12'
 s='''
 1.下载游戏
 2.启动游戏
@@ -159,6 +159,8 @@ v0.0.10
 修复了一些bug
 v0.0.11
 修复了很多bug
+v0.0.12
+优化下载mc
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -170,7 +172,7 @@ print('完成!')
 if opt['check_update']:
     print('正在检查更新')
     try:check_update(version,'mhl')
-    except:raise;print('失败')
+    except:print('失败')
 while True:
     if not exists('.minecraft'):os.mkdir('.minecraft')
     clear()
