@@ -160,15 +160,6 @@ def mcjava(v,vd,d='.minecraft'):
         if mvv[0]>=dc['21']:return '21'"""
     return str(dc['javaVersion']['majorVersion'])
 def removemc(ver,vdc,d='.minecraft'):
-    us,ps,uu,pp=gtmcurl(ver,vdc)
-    for i in ps:
-        if exists(i):
-            os.remove(i)
-            print('删除',i)
-    for i in pp:
-        if exists(i):
-            os.remove(i)
-            print('删除',i)
     p=pj(d,'versions/'+ver)
     if exists(p):
         sht.rmtree(p)

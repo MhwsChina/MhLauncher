@@ -29,7 +29,7 @@ def printvdc(vdc):
         pause()
         return
     print('1.正式版\n2.测试版\n3.远古alpha版\n4.远古beta版')
-    c=input('选择序号:')
+    c=input('选择序号:',['1','2','3','4'])
     if c=='1':t='release'
     if c=='2':t='snapshot'
     if c=='3':t='old_alpha'
@@ -52,24 +52,42 @@ def readv(ver,d='.minecraft'):
 def readass(aid,d='.minecraft'):
     with open(pj(d,'assets/indexes/'+aid+'.json'),'r') as f:
         return loads(f.read())
+def getjsonurl(vdc,ver,d='.minecraft'):
+    verurl=ov(vdc,ver,find=True)
+    if verurl==[]:return False,pj(d,'versions/'+ver+'/'+ver+'.json')
+    verurl=verurl['url']
+    #if bm:verurl=verurl.replace('piston-meta.mojang.com','bmclapi2.bangbang93.com')
+    return verurl,pj(d,'versions/'+ver+'/'+ver+'.json')
+def getassurl(vdc,d='.minecraft'):
+    if 'assetIndex' in vdc:
+        return vdc["assetIndex"]["url"],pj(d,'assets/indexes/'+vdc["assetIndex"]["id"]+'.json')
+    else:return False,False
 def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
+    if not bq and vdc=={}:
+        print('无法加载版本列表,请检查网络连接')
+        return
     us,ps,uu,pp=[],[],[],[]
-    if bq:sha1s=[];vdc=readv(ver)
-    else:
-        if vdc=={}:
-            print('下载失败:版本列表无法加载')
-            pause()
-            return
-        verurl=ov(vdc,ver,find=True)
-        verurl=verurl['url']
-        if bm:verurl=verurl.replace('piston-meta.mojang.com','bmclapi2.bangbang93.com')
-        uu.append(verurl)
-        pp.append(pj(d,'versions/'+ver+'/'+ver+'.json'))
-        try:vdc=loads(rq.get(verurl,timeout=10).text)
-        except:vdc=readv(ver)
+    if bq:sha1s=[]
+    url,path=getjsonurl(vdc,ver,d)
+    if url:
         clienturl=f"https://bmclapi2.bangbang93.com/version/{ver}/client"
-        uu.append(clienturl)
-        pp.append(pj(d,'versions/'+ver+'/'+ver+'.jar'))
+        clientpath=pj(d,'versions/'+ver+'/'+ver+'.jar')
+        if bq:
+            uu.append(url);pp.append(path)
+            uu.append(clienturl);pp.append(clientpath)
+        else:
+            print('开始下载版本索引')
+            dnld(url,path,1000)
+            print('完成')
+            us.append(clienturl);ps.append(clientpath)
+    vdc=readv(ver)
+    url,path=getassurl(vdc,d)
+    if url:
+        if bq:uu.append(url);pp.append(path)
+        else:
+            print('开始下载资源索引')
+            dnld(url,path,1000)
+            print('完成')
     for lib in vdc['libraries']:
         if 'downloads' not in lib:
             tags=lib['name'].split(':')
@@ -109,12 +127,7 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
                 us.append(url);ps.append(path)
                 if bq:sha1s.append(cl['sha1'])
     if 'assetIndex' in vdc:
-        assurl=vdc["assetIndex"]["url"]
-        if bm:assurl=assurl.replace("launcher.mojang.com","bmclapi2.bangbang93.com")
-        asspath=pj(d,'assets/indexes/'+vdc["assetIndex"]["id"]+'.json')
-        uu.append(assurl);pp.append(asspath)
-        if bq:assdc=readass(vdc["assetIndex"]["id"])
-        else:assdc=loads(rq.get(assurl,timeout=10).text)
+        assdc=readass(vdc["assetIndex"]["id"])
         for obj in assdc['objects'].values():
             if bm:url=f"https://bmclapi2.bangbang93.com/assets/{obj['hash'][0:2]}/{obj['hash']}"
             else:url=f"https://resources.download.minecraft.net/{obj['hash'][0:2]}/{obj['hash']}"
@@ -122,13 +135,11 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
             us.append(url);ps.append(path)
             if bq:sha1s.append(obj['hash'])
     if bq:return us,ps,uu,pp,sha1s
-    return us,ps,uu,pp
+    return us,ps
 def downloadmc(ver,vdc,thread=128,dlout=0,bm=False,d='.minecraft'):
-    urls,paths,uu,pp=gtmcurl(ver,vdc,d,bm)
     print('开始下载',ver)
+    urls,paths=gtmcurl(ver,vdc,d,bm)
     print('开始下载资源文件')
     xcdnld(urls,paths,thread,dlout)
-    print('开始下载主文件')
-    xcdnld(uu,pp,thread,dlout)
     print(ver,'下载完成')
     pause()

@@ -30,7 +30,7 @@ def dnld(url,path,timeout=2):
             f.write(res.content)
     except:
         dnld(url,path,timeout)
-def onednld(url,path,timeout=2,chunk_size=1048576,r=None):
+def onednld(url,path,timeout=2,chunk_size=1048576,r=None,rs=0):
     try:
         res=rq.get(url,timeout=timeout,stream=True)
         p,f,size=os.path.split(path)[0],0,int(res.headers.get('content-length', 0))
@@ -45,7 +45,7 @@ def onednld(url,path,timeout=2,chunk_size=1048576,r=None):
                     ff.write(c)
                     if r!=None:r(f,size)
     except:
-        raise
+        if rs:raise
         onednld(url,path,timeout,chunk_size,r)
     print()
 def dnlds(out=False):
@@ -71,8 +71,11 @@ def xcdnld(urls,paths,thread,out=False):
     ls=qp(f1,thread)
     if f1<thread:thread=f1
     for i in range(thread):
-        thd.Thread(target=dnlds,args=(out,)).start()
-        sleep(0.01)
+        try:thd.Thread(target=dnlds,args=(out,)).start()
+        except:
+            while True:
+                try:thd.Thread(target=dnlds,args=(out,)).start();break
+                except:sleep(0.01)
     jdt=50
     while True:
         try:
@@ -86,8 +89,8 @@ def xcdnld(urls,paths,thread,out=False):
             t0=int(jdt*jd)
             t1=jdt-t0
             stdout.write(f'\r进度:[{t0*"#"}{t1*"."}] {int(jd*100)}% {f}/{f1} {th}')
-            sleep(0.00000000000000000000000000000000000000000001)
         except:pass
+        sleep(0.01)
     stdout.write('\n')
 def rtor(f,f1):
     jd=f/f1
