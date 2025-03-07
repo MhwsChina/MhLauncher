@@ -57,6 +57,7 @@ def dnlds(out=False):
         p=ps.pop(0)
         t=False
         if out:stdout.write(f'\r下载 {p}{40*" "}\n')
+        #stdout.write(f'\r下载 {u}{40*" "}\n')
         try:
             dnld(u,p)
             f+=1
@@ -90,7 +91,7 @@ def xcdnld(urls,paths,thread,out=False):
             t1=jdt-t0
             stdout.write(f'\r进度:[{t0*"#"}{t1*"."}] {int(jd*100)}% {f}/{f1} {th}')
         except:pass
-        sleep(0.01)
+        sleep(0.05)
     stdout.write('\n')
 def rtor(f,f1):
     jd=f/f1
