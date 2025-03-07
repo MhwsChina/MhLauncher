@@ -19,8 +19,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','dlout','marg','outlog']
-    ck=[0,128,1,0,0,[],0]
+    ch=['opt','thread','check_update','bqwj','dlout','marg','outlog','bm']
+    ck=[0,128,1,0,0,[],0,1]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -91,7 +91,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.12'
+'''[1:-1],'v0.0.13'
 s='''
 1.下载游戏
 2.启动游戏
@@ -118,6 +118,7 @@ s2='''
 9.补全文件设置
 10.多线程下载输出设置
 11.游戏日志输出设置
+12.设置下载源
 -1.返回
 -2.查看更新日志
 '''[1:-1]
@@ -161,6 +162,8 @@ v0.0.11
 修复了很多bug
 v0.0.12
 优化下载mc
+v0.0.13
+加入bmclapi下载源
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -190,15 +193,15 @@ while True:
         if b=='4':
             ver=input('游戏版本:')
             if ver=='':continue
-            try:downloadmc(ver,vdc,opt['thread'],opt['dlout'])
+            try:downloadmc(ver,vdc,opt['thread'],opt['dlout'],bm=opt['bm'])
             except:print('下载失败');pause()
         if b=='3':
             printvdc(vdc)
         if b=='2':
-            try:downloadmc(ov(vdc,'snapshot',1),vdc,opt['thread'],opt['dlout'])
+            try:downloadmc(ov(vdc,'snapshot',1),vdc,opt['thread'],opt['dlout'],bm=opt['bm'])
             except:print('下载失败');pause()
         if b=='1':
-            try:downloadmc(ov(vdc,'release',1),vdc,opt['thread'],opt['dlout'])
+            try:downloadmc(ov(vdc,'release',1),vdc,opt['thread'],opt['dlout'],bm=opt['bm'])
             except:print('下载失败');pause()
     if a=='3':qidong(True)
     if a=='4':rmmc()
@@ -251,6 +254,12 @@ while True:
             c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
             if c=='y':opt['outlog']=1
             else:opt['outlog']=0
+            upopt(opt)
+        if b=='12':
+            print('选择下载源:\n1.官方源(速度慢,但是最新)\n2.国内源(速度快,但不是最新)(默认)')
+            c=input('请选择序号:')
+            if c=='1':opt['bm']=0
+            else:opt['bm']=1
             upopt(opt)
         if b=='-2':
             print(s3)
