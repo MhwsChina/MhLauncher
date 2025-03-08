@@ -1,11 +1,19 @@
 from .log import *
-import os,platform
+import os,platform,re
 from json import loads
 def pj(*args):
     return os.path.join(*args).replace('\\','/')
 def readv(ver,d='.minecraft'):
     with open(pj(d,'versions/'+ver+'/'+ver+'.json'),'r') as f:
         return loads(f.read())
+def get_os_version() -> str:
+    if platform.system() == "Windows":
+        ver = sys.getwindowsversion()
+        return f"{ver.major}.{ver.minor}"
+    elif platform.system == "Darwin":
+        return ""
+    else:
+        return platform.uname().release
 def parseo(rule):
     if rule["action"] == "allow":returnvalue = False
     elif rule["action"] == "disallow":returnvalue = True

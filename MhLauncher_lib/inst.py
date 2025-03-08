@@ -2,7 +2,8 @@ import requests as rq
 from json import loads
 from .xcdl import *
 from .log import *
-import os
+from .asyncdl import *
+import os,asyncio
 def pj(*args):
     return os.path.join(*args).replace('\\','/')
 def gt(urls,timeout=10):
@@ -141,5 +142,6 @@ def downloadmc(ver,vdc,thread=128,dlout=0,bm=False,d='.minecraft'):
     urls,paths=gtmcurl(ver,vdc,d,bm)
     print('开始下载资源文件')
     xcdnld(urls,paths,thread,dlout)
+    #asyncio.run(asyncdl(urls,paths,300))
     print(ver,'下载完成')
     pause()
