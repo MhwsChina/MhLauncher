@@ -91,7 +91,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.13'
+'''[1:-1],'v0.0.14'
 s='''
 1.下载游戏
 2.启动游戏
@@ -164,6 +164,8 @@ v0.0.12
 优化下载mc
 v0.0.13
 加入bmclapi下载源
+v0.0.14
+下载更加迅速
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -194,7 +196,7 @@ while True:
             ver=input('游戏版本:')
             if ver=='':continue
             try:downloadmc(ver,vdc,opt['thread'],opt['dlout'],bm=opt['bm'])
-            except:print('下载失败');pause()
+            except:raise;print('下载失败');pause()
         if b=='3':
             printvdc(vdc)
         if b=='2':
