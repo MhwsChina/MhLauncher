@@ -2,8 +2,7 @@ import requests as rq
 from json import loads
 from .xcdl import *
 from .log import *
-from .asyncdl import *
-import os,asyncio
+import os
 def pj(*args):
     return os.path.join(*args).replace('\\','/')
 def gt(urls,timeout=10):

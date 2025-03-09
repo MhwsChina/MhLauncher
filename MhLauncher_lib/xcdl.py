@@ -23,7 +23,7 @@ def exists(p):
 def dnld(url,path,timeout=20):
     try:
         res=rq.get(url,timeout=timeout)
-        try:os.makedirs(os.path.split(path)[0],exists_ok=1)
+        try:os.makedirs(os.path.split(path)[0])
         except:pass
         with open(path,'wb') as f:
             f.write(res.content)
@@ -34,7 +34,7 @@ def onednld(url,path,timeout=20,chunk_size=1048576,r=None,rs=0):
     try:
         res=rq.get(url,timeout=timeout,stream=True)
         f,size=0,int(res.headers.get('content-length', 0))
-        try:os.makedirs(os.path.split(path)[0],exists_ok=1)
+        try:os.makedirs(os.path.split(path)[0])
         except:pass
         jdt=50
         with open(path,'wb') as ff:
@@ -96,7 +96,7 @@ def xcdnld(urls,paths,thread,out=False):
     tmp,t=0,0
     for i in tqdm(range(f1),desc='进度',unit='文件'):
         if th>=thread:break
-        while i+1>=f:sleep(0.1)
+        while i>=f:sleep(0.1)
 def rtor(f,f1):
     jd=f/f1
     t0=int(50*jd)
