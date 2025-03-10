@@ -1,11 +1,13 @@
 from .inst import *
 from .xcdl import *
 from .args import *
+from .ver import *
 from json import loads,dumps
 import subprocess as sub
 import os,zipfile,hashlib,uuid,random
 import threading as th
 import shutil as sht
+log('launch模块已加载,版本'+libver())
 def unpress(fl,p,f=False):
     try:
         

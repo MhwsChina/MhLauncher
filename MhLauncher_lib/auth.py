@@ -6,7 +6,6 @@ from json import loads
 from json import dumps
 import webbrowser#打开网页
 
-
 def OAuth():
     webbrowser.open("https://login.live.com/oauth20_authorize.srf\
  ?client_id=00000000402b5328\

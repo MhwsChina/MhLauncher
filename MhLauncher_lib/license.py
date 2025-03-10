@@ -1,4 +1,6 @@
 from .log import *
+from .ver import *
+log('license模块已加载,版本'+libver())
 ls='''
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

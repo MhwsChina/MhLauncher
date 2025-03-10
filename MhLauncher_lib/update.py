@@ -3,6 +3,8 @@ from json import loads
 import sys,os,shutil
 from .xcdl import *
 from .log import *
+from .ver import *
+log('update模块已加载,版本'+libver())
 def check_update(now_version,save_path='',write_path=sys.argv[0],api_url='https://api.github.com/repos/MhwsChina/MhLauncher/tags',dlurl='https://gh.llkk.cc/https://github.com/MhwsChina/MhLauncher/releases/download/%tagver%/Launcher.exe',timeout=10):
     req.packages.urllib3.disable_warnings()
     js=loads(req.get(api_url,timeout=timeout,verify=False).text)
