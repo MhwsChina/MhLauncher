@@ -1,4 +1,4 @@
-from MhLauncher_lib import *
+from MhLauncherLib import *
 import os,sys,uuid
 import webbrowser as wb
 from json import dumps,loads
