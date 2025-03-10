@@ -20,7 +20,7 @@ def init():
     return dic
 def fdic(dic={}):
     ch=['opt','thread','check_update','bqwj','dlout','marg','outlog','bm']
-    ck=[0,128,1,0,0,[],0,0]
+    ck=[0,256,1,0,0,[],0,0]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -91,7 +91,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.16'
+'''[1:-1],'v0.0.17'
 s='''
 1.下载游戏
 2.启动游戏
@@ -170,6 +170,8 @@ v0.0.15
 紧急修复一些bug
 v0.0.16
 修复了一些bug
+v0.0.17
+修复了一些bug
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -217,7 +219,7 @@ while True:
         if b=='1':
             opt['opt']['username']=input('请输入游戏名:');upopt(opt)
         if b=='2':
-            opt['thread']=input('请输入线程数(默认128)',typ=int);upopt(opt)
+            opt['thread']=input('请输入线程数(默认256,推荐128-512之间最佳)',typ=int);upopt(opt)
         if b=='3':
             print('[温馨提示]: 皮肤功能暂未测试,可能无法使用')
             url=input('皮肤网址(输-1返回):')
