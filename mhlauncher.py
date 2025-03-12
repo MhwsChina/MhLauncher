@@ -64,7 +64,7 @@ def qidong(out=None):
                     pause()
                     return
             elif sa=='2':
-                downjava(j,'./mhl/java','./mhl')
+                downjava(mcjava(v[n],vdc,m=False),'./mhl/java',opt['thread'])
                 java=fjava(ls=['mhl/java'],t=1)[j]
             else:return
         if out:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'],opt['outlog'],v[n]+'.bat')
@@ -91,7 +91,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.17'
+'''[1:-1],'v0.0.18'
 s='''
 1.下载游戏
 2.启动游戏
@@ -110,15 +110,14 @@ s2='''
 1.设置游戏名
 2.设置下载线程
 3.自定义皮肤
-4.自动安装java
-5.自动检查更新设置
-6.查看本程序源代码(github)
-7.查看本程序协议
-8.设置游戏运行内存
-9.补全文件设置
-10.多线程下载输出设置
-11.游戏日志输出设置
-12.设置下载源
+4.自动检查更新设置
+5.查看本程序源代码(github)
+6.查看本程序协议
+7.设置游戏运行内存
+8.补全文件设置
+9.多线程下载输出设置
+10.游戏日志输出设置
+11.设置下载源
 -1.返回
 -2.查看更新日志
 '''[1:-1]
@@ -172,6 +171,9 @@ v0.0.16
 修复了一些bug
 v0.0.17
 修复了一些bug
+v0.0.18
+支持windows,macos,linux等各种系统
+只要能装python就能启动
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -235,35 +237,31 @@ while True:
             opt['opt']=opt['opt'].update(ssk)
             upopt(opt)
         if b=='4':
-            c=input('请输入Java版本(8/16/17/21)(输入-1返回):',['8','16','17','21','-1'])
-            if c=='-1':continue
-            downjava(c,'./mhl/java','./mhl')
-        if b=='5':
             print('是否在程序启动时检查更新?')
             c=input('(输入y表示是,输入n表示否,默认为是)',['n','y'])
             if c=='y':opt['check_update']=1
             else:opt['check_update']=0
             upopt(opt)
-        if b=='6':
+        if b=='5':
             wb.open('https://github.com/MhwsChina/MhLauncher')
-        if b=='9':
+        if b=='8':
             c=input('1.快速模式(但不全面)(默认)/2.全面模式(但不快速)/3.返回',['1','2','3'])
             if c=='1':opt['bqwj']=0
             if c=='2':opt['bqwj']=1
             upopt(opt)
-        if b=='10':
+        if b=='9':
             print('是否在下载时显示下载的文件?')
             c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
             if c=='y':opt['dlout']=1
             else:opt['dlout']=0
             upopt(opt)
-        if b=='11':
+        if b=='10':
             print('是否在游戏运行时输出日志?')
             c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
             if c=='y':opt['outlog']=1
             else:opt['outlog']=0
             upopt(opt)
-        if b=='12':
+        if b=='11':
             print('选择下载源:\n1.官方源(速度慢,但是最新)\n2.国内源(速度快,但不是最新)(默认)')
             c=input('请选择序号:')
             if c=='1':opt['bm']=0
@@ -272,9 +270,9 @@ while True:
         if b=='-2':
             print(s3)
             pause()
-        if b=='7':
+        if b=='6':
             show_license()
             pause()
-        if b=='8':
+        if b=='7':
             opt['marg']=setmem()
             upopt(opt)
