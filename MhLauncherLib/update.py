@@ -3,11 +3,16 @@ from json import loads
 import sys,os,shutil
 from .xcdl import *
 from .log import *
-from .ver import *
-log('update模块已加载,版本'+libver())
 def check_update(now_version,save_path='',write_path=sys.argv[0],api_url='https://api.github.com/repos/MhwsChina/MhLauncher/tags',dlurl='https://gh.llkk.cc/https://github.com/MhwsChina/MhLauncher/releases/download/%tagver%/Launcher.exe',timeout=10):
     req.packages.urllib3.disable_warnings()
-    js=loads(req.get(api_url,timeout=timeout,verify=False).text)
+    i=0
+    for i in range(3):
+        try:
+            js=loads(req.get(api_url,timeout=timeout,verify=False).text)
+        except:
+            i+=1
+            if i==4:raise RuntimeError('无法获取更新')
+            log('[update]: 获取更新失败,正在重试第'+str(i)+'次!')
     latest=js[0]
     n=list(map(int,latest['name'].replace('v','').split('.')))
     n1=list(map(int,now_version.replace('v','').split('.')))

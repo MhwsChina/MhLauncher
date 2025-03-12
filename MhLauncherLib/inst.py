@@ -3,8 +3,6 @@ from json import loads
 from .xcdl import *
 from .log import *
 import os
-from .ver import *
-log('install模块已加载,版本'+libver())
 def pj(*args):
     return os.path.join(*args).replace('\\','/')
 def gt(urls,timeout=10):

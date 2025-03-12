@@ -32,3 +32,5 @@ def listprint(ls,fst=0):
     for i in ls:
         print('{0:<{1}} {2}'.format(j,l,i))
         j+=1
+def pj(*args):
+    return os.path.join(*args).replace('\\','/')

@@ -1,13 +1,11 @@
 from .inst import *
 from .xcdl import *
 from .args import *
-from .ver import *
 from json import loads,dumps
 import subprocess as sub
 import os,zipfile,hashlib,uuid,random
 import threading as th
 import shutil as sht
-log('launch模块已加载,版本'+libver())
 def unpress(fl,p,f=False):
     try:
         
@@ -143,7 +141,7 @@ def indexv(v,vd):
         if vdd[i]['id']=='24w14a':dc['21s']=i#java21 x64
         if vdd[i]['id']==v:dc['v']=[i,vdd[i]['type']]
     return dc
-def mcjava(v,vd,d='.minecraft'):
+def mcjava(v,vd,d='.minecraft',m=True):
     dc=readv(v)
     if 'inheritsFrom' in dc:dc=readv(dc['inheritsFrom'])
     """if 'id' in dc:v=dc['id']
@@ -160,14 +158,15 @@ def mcjava(v,vd,d='.minecraft'):
         if mvv[0]>=dc['16'] and mvv[0]<dc['17']:return '16'
         if mvv[0]>=dc['17'] and mvv[0]<dc['21']:return '17'
         if mvv[0]>=dc['21']:return '21'"""
-    return str(dc['javaVersion']['majorVersion'])
+    if m:return str(dc['javaVersion']['majorVersion'])
+    else:return str(dc['javaVersion']['component'])
 def removemc(ver,vdc,d='.minecraft'):
     p=pj(d,'versions/'+ver)
     if exists(p):
         sht.rmtree(p)
         print('删除',p)
     print(ver,'删除完毕')   
-def downjava(ver,p='java',dp=''):
+'''def downjava(ver,p='java',dp=''):
     dc={
         '21':'https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_windows-x64_bin.zip',
         '17':'https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.zip',
@@ -180,4 +179,4 @@ def downjava(ver,p='java',dp=''):
     print('下载完成')
     if not exists(p):os.mkdir(p)
     unpress(f,p,True)
-    os.remove(f)
+    os.remove(f)'''

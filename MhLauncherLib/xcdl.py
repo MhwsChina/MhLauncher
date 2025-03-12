@@ -5,8 +5,8 @@ from sys import stdout
 from time import sleep
 from tqdm import tqdm
 f,th,us,ps,rands,t=0,0,[],[],[],False
-def pj(a,b):
-    return os.path.join(a,b).replace('\\','/')
+def pj(*args):
+    return os.path.join(*args).replace('\\','/')
 def qp(n, chuck):
     rs=[]
     if n<chuck:return [[i,i] for i in range(n)]
