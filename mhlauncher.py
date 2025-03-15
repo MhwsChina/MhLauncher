@@ -19,8 +19,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','dlout','marg','outlog','bm']
-    ck=[0,256,1,0,0,[],0,0]
+    ch=['opt','thread','check_update','bqwj','dlout','marg','outlog','bm','gl']
+    ck=[0,256,1,0,0,[],0,0,0]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -55,7 +55,7 @@ def qidong(out=None):
             sa=input('选择序号:')
             if sa=='1':
                 java=input(f'java{j}文件夹路径:')
-                if isjavaf(java,'javaw.exe'):
+                if isjavaf(java):
                     opt[v]=pth
                     upopt(opt)
                     java=opt['java'][j]
@@ -67,8 +67,8 @@ def qidong(out=None):
                 downjava(mcjava(v[n],vdc,m=False),'./mhl/java',opt['thread'])
                 java=fjava(ls=['mhl/java'],t=1)[j]
             else:return
-        if out:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'],opt['outlog'],v[n]+'.bat')
-        else:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'],opt['outlog'])
+        if out:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'],opt['outlog'],v[n]+'.bat',gl=opt['gl'])
+        else:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'],opt['outlog'],gl=opt['gl'])
 def rmmc():
     v=allv()
     if v==[]:print('没有可删除版本');pause();return
@@ -91,7 +91,7 @@ welc,version='''
  | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
  |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
 
-'''[1:-1],'v0.0.18'
+'''[1:-1],'v0.0.19'
 s='''
 1.下载游戏
 2.启动游戏
@@ -118,6 +118,7 @@ s2='''
 9.多线程下载输出设置
 10.游戏日志输出设置
 11.设置下载源
+12.版本隔离设置
 -1.返回
 -2.查看更新日志
 '''[1:-1]
@@ -174,6 +175,9 @@ v0.0.17
 v0.0.18
 支持windows,macos,linux等各种系统
 只要能装python就能启动
+v0.0.19
+加入版本隔离
+修复了很多bug
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -266,6 +270,13 @@ while True:
             c=input('请选择序号:')
             if c=='1':opt['bm']=0
             else:opt['bm']=1
+            upopt(opt)
+        if b=='12':
+            print('是否启用版本隔离?')
+            print('#启用后,每个mc版本的存档和模组互不相通')
+            c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
+            if c=='y':opt['gl']=1
+            else:opt['gl']=0
             upopt(opt)
         if b=='-2':
             print(s3)
