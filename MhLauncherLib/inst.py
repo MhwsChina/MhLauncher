@@ -80,7 +80,12 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
             dnld(url,path,1000)
             print('完成')
             us.append(clienturl);ps.append(clientpath)
-    vdc=readv(ver)
+    try:vdc=readv(ver)
+    except:
+        print('开始下载版本索引')
+        dnld(url,path,1000)
+        print('完成')
+        vdc=readv(ver)
     url,path=getassurl(vdc,d)
     if url:
         if bq:uu.append(url);pp.append(path)
@@ -127,7 +132,13 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
                 us.append(url);ps.append(path)
                 if bq:sha1s.append(cl['sha1'])
     if 'assetIndex' in vdc:
-        assdc=readass(vdc["assetIndex"]["id"])
+        try:assdc=readass(vdc["assetIndex"]["id"])
+        except:
+            url,path=getassurl(vdc,d)
+            print('开始下载资源索引')
+            dnld(url,path,1000)
+            print('完成')
+            assdc=readass(vdc["assetIndex"]["id"])
         for obj in assdc['objects'].values():
             if bm:url=f"https://bmclapi2.bangbang93.com/assets/{obj['hash'][0:2]}/{obj['hash']}"
             else:url=f"https://resources.download.minecraft.net/{obj['hash'][0:2]}/{obj['hash']}"
