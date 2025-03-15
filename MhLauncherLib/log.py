@@ -1,4 +1,4 @@
-import sys,time,os
+import sys,time,os,inspect
 inputf=input
 def input(txt='',ls=[],typ=str,err='输入不正确,请重新输入!'):
     while True:
@@ -12,9 +12,13 @@ def input(txt='',ls=[],typ=str,err='输入不正确,请重新输入!'):
 pprint=print
 def print(*args,end='\n'):
     sys.stdout.write(' '.join(map(str,[*args]))+end)
-def log(txt,mode='INFO'):
+def log(*args,mode='INFO'):
+    txt=' '.join([*args])
+    m=inspect.currentframe().f_back.f_code.co_name
+    if m=='<module>':m=''
+    else:m=f'[{m}]: '
     t=time.strftime('%H:%M:%S',time.localtime(time.time()))
-    print(f'[{t} {mode}]: {txt}')
+    print(f'[{t} {mode}]: {m}{txt}')
 def pause():
     return input('按Enter键继续...')
 def clear():

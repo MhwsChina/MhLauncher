@@ -3,9 +3,16 @@ from .xcdl import *
 from .args import *
 from json import loads,dumps
 import subprocess as sub
-import os,zipfile,hashlib,uuid,random
+import os,zipfile,hashlib,uuid,random,platform
 import threading as th
 import shutil as sht
+def javart():
+    if platform.system() == 'Windows':
+        return 'javaw.exe'
+    if platform.system() == 'Darwin':
+        return 'java'
+    if platform.system()=='Linux':
+        return 'java'
 def unpress(fl,p,f=False):
     try:
         
@@ -43,7 +50,7 @@ def setmem(opt):
         c=str(input('大小:',typ=int))
         return ['-Xmx'+c+b,'-Xmn'+c+b]
     return []
-def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,dlout=0,marg=[],outlog=False,out=None,d='.minecraft'):
+def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,dlout=0,marg=[],outlog=False,out=None,d='.minecraft',gl=False):
     print('正在补全文件...')
     dc=readv(ver)
     if 'inheritsFrom' in dc:
@@ -51,8 +58,10 @@ def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,dlout=0,marg=[],outlog=False,o
     bqwj(ver,vdc,d,bqthread,sha,dlout)
     print('完成!')
     if not o:o=testplayer()
+    if not 'javaw' in javaw:
+        outlog=True
     if outlog:javaw=javaw.replace('javaw','java')
-    cmd=getmcargs(ver,javaw,o,marg,d)
+    cmd=getmcargs(ver,javaw,o,marg,d,gl)
     if out:
         cmd[0]='"{}"'.format(cmd[0].replace('"',''))
         with open(out,'w',encoding='utf-8') as f:
@@ -87,12 +96,12 @@ def bqwj(ver,vdc,di,thread,sha=0,out=0):
         if 'classifiers' in l['downloads']:
             for n in l['downloads']:
                 if n=='artifact':
-                    p=pj(di,'versions/'+ver+'/'+'natives')
+                    p=pj(di,'versions/'+ver+'/'+ver+'-natives')
                     fl=pj(di,'libraries'+'/'+l["downloads"][n]['path'])
                     unpress(fl,p)
                 if n=='classifiers':
                     for n in l['downloads'][n].values():
-                        p=pj(di,'versions/'+ver+'/'+'natives')
+                        p=pj(di,'versions/'+ver+'/'+ver+'-natives')
                         fl=pj(di,'libraries'+'/'+n['path'])
                         unpress(fl,p)
 def allv(d='.minecraft'):
@@ -106,17 +115,26 @@ def allv(d='.minecraft'):
     return ls
 def isv(i,d='.minecraft'):
     return exists(pj(d,'versions/'+i+'/'+i+'.json'))
-def isjavaf(java,find):
-    pth=pj(java,f'bin/{find}')
-    if exists(pth):
-        with open(pj(java,f'release'),'r') as f:
-            for i in f.read().split('\n'):
-                if 'JAVA_VERSION' in i and not 'DATE' in i:
-                    ver=i.split('=')[1].replace('"','')
-                    if '_' in ver:v=ver.split('.')[1]
-                    else:v=ver.split('.')[0]
+def isjavaf(java,find=javart()):
+    v,tag,pth=0,0,0
+    for r,d,f in os.walk(java):
+        for name in f:
+            if 'bin' in r and name==find:
+                tag=True
+                pth=pj(r,name)
+            if name=='release':
+                f=open(pj(r,name),'r')
+                i=f.readline()
+                while i:
+                    i=i.replace('\n','').replace('"','')
+                    if i.split('=')[0]=='JAVA_VERSION':
+                        v=i.split('=')[1]
+                        if '1.8.0' in v:v='8'
+                        else:v=v.split('.')[0]
+                        break
+                    i=f.readline()                   
     return pth,v
-def fjava(find='javaw.exe',ls=['java'],t=True):
+def fjava(find=javart(),ls=['java'],t=True):
     jv={}
     if t:ls.append(pj(os.path.expandvars("%APPDATA%"),'.minecraft/runtime'))
     for java in ls:

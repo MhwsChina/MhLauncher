@@ -63,15 +63,15 @@ def getcp(ver,d='.minecraft',cl=True):
         classpath+=path+fg
     if cl:classpath+=pj(d,'versions',ver,ver+'.jar')
     return classpath
-def fmarg(txt,ver,classpath,v,opt,d='.minecraft'):
+def fmarg(txt,ver,classpath,v,opt,gmdir,d='.minecraft'):
     if 'assets' in v:
-        txt=txt.replace('${natives_directory}',pj(d,f'versions/{ver}/natives'))\
+        txt=txt.replace('${natives_directory}',pj(d,f'versions/{ver}/{ver}-natives'))\
              .replace('${launcher_name}','MhLauncher')\
              .replace('${launcher_version}','114514.0.0')\
              .replace('${classpath}',classpath)\
              .replace('${auth_player_name}',opt['username'])\
              .replace('${version_name}',ver)\
-             .replace('${game_directory}',d)\
+             .replace('${game_directory}',gmdir)\
              .replace('${assets_root}',pj(d,'assets'))\
              .replace('${assets_index_name}',v['assets'])\
              .replace('${auth_uuid}',opt['uuid'])\
@@ -89,13 +89,13 @@ def fmarg(txt,ver,classpath,v,opt,d='.minecraft'):
              #.replace('${quickPlayMultiplayer}',opt['quickplaymultiplayer'])\
              #.replace('${quickPlayRealms}',opy['quickplayrealms'])
     else:
-        txt=txt.replace('${natives_directory}',pj(d,f'versions/{ver}/natives'))\
+        txt=txt.replace('${natives_directory}',pj(d,f'versions/{ver}/{ver}-natives'))\
              .replace('${launcher_name}','MhLauncher')\
              .replace('${launcher_version}','114514.0.0')\
              .replace('${classpath}',classpath)\
              .replace('${auth_player_name}',opt['username'])\
              .replace('${version_name}',ver)\
-             .replace('${game_directory}',d)\
+             .replace('${game_directory}',gmdir)\
              .replace('${auth_uuid}',opt['uuid'])\
              .replace('${auth_access_token}',opt['token'])\
              .replace('${user_type}','msa')\
@@ -107,7 +107,7 @@ def fmarg(txt,ver,classpath,v,opt,d='.minecraft'):
              .replace('${auth_session}',opt['token'])\
              .replace('${library_directory}',pj(d,'libraries'))
     return txt
-def getjvm(v,ver,classpath,opt,d):
+def getjvm(v,ver,classpath,opt,d,gmdir):
     args=[]
     if 'inheritsFrom' in v:
         args=args+getjvm(readv(v['inheritsFrom'],d),ver,classpath,opt,d)
@@ -115,19 +115,19 @@ def getjvm(v,ver,classpath,opt,d):
         if 'jvm' in v['arguments']:
             for i in v['arguments']['jvm']:
                 if type(i)==str:
-                    args.append(fmarg(i,ver,classpath,v,opt,d))
+                    args.append(fmarg(i,ver,classpath,v,opt,gmdir,d))
                 else:
                     if 'rules' in i and not parsel(i['rules']):continue
                     args.append(i['value'])
     elif 'jvmArguments' in v:
         args=args+v['jvmArguments']
     else:
-        args.append('-Djava.library.path='+pj(d,f'versions/{ver}/natives'))
+        args.append('-Djava.library.path='+pj(d,f'versions/{ver}/{ver}-natives'))
     if 'minecraftArguments' in v:
         args.append('-cp')
         args.append(classpath)
     return args
-def getgame(v,ver,classpath,opt,d):
+def getgame(v,ver,classpath,opt,d,gmdir):
     args=[]
     if 'inheritsFrom' in v:
         return getgame(readv(v['inheritsFrom'],d),ver,classpath,opt,d)
@@ -135,16 +135,18 @@ def getgame(v,ver,classpath,opt,d):
         if 'game' in v['arguments']:
             for i in v['arguments']['game']:
                if type(i)==str:
-                   args.append(fmarg(i,ver,classpath,v,opt,d))
+                   args.append(fmarg(i,ver,classpath,v,opt,gmdir,d))
     if 'minecraftArguments' in v:
-        args=args+fmarg(v['minecraftArguments'],ver,classpath,v,opt,d).split()
+        args=args+fmarg(v['minecraftArguments'],ver,classpath,v,opt,gmdir,d).split()
     return args
-def getmcargs(ver,java,opt,marg=[],d='.minecraft'):
+def getmcargs(ver,java,opt,marg=[],d='.minecraft',gl=False):
     v=readv(ver,d)
     args=[java,'-XX:+UseG1GC','-XX:-UseAdaptiveSizePolicy','-XX:-OmitStackTraceInFastThrow']
     if marg:args=args+marg
     classpath=getcp(ver,d=d)
-    args=args+getjvm(v,ver,classpath,opt,d)
+    if gl:gmdir=pj(d,'versions',ver)
+    else:gmdir=d
+    args=args+getjvm(v,ver,classpath,opt,d,gmdir)
     args.append(v['mainClass'])
-    args=args+getgame(v,ver,classpath,opt,d)
+    args=args+getgame(v,ver,classpath,opt,d,gmdir)
     return args
