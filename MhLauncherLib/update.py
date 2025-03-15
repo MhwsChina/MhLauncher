@@ -3,7 +3,7 @@ from json import loads
 import sys,os,shutil
 from .xcdl import *
 from .log import *
-def check_update(now_version,save_path='',write_path=sys.argv[0],api_url='https://api.github.com/repos/MhwsChina/MhLauncher/tags',dlurl='https://gh.llkk.cc/https://github.com/MhwsChina/MhLauncher/releases/download/%tagver%/Launcher.exe',timeout=10):
+def check_update(now_version,save_path='',write_path=sys.argv[0],api_url='https://api.github.com/repos/MhwsChina/MhLauncher/tags',dlurl='https://github-proxy.lixxing.top/https://github.com/MhwsChina/MhLauncher/releases/download/%tagver%/Launcher.exe',timeout=10):
     req.packages.urllib3.disable_warnings()
     i=0
     for i in range(3):
