@@ -36,7 +36,7 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.23'
+version='v0.0.24'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
@@ -102,6 +102,8 @@ v0.0.22
 修复无法自定义内存的bug
 v0.0.23
 添加ui界面!!!!!!!!!!!!!
+修复了一些bug
+v0.0.24
 修复了一些bug
 '''[1:-1]
 print('正在加载配置文件...')
@@ -243,7 +245,7 @@ class main_ui:
         opt['mb']=self.mb.get()
         upopt(opt)
     def setus(self,event):
-        opt['username']=self.usbox.get()
+        opt['opt']['username']=self.usbox.get()
         upopt(opt)
     def runmc(self,out=None):
         if self.usbox.get()!='':self.setus(1)
