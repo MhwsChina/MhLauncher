@@ -1,7 +1,9 @@
+import tkinter as tk
+import tkinter.ttk as ttk
+import tkinter.messagebox as mess
 from MhLauncherLib import *
-import os,sys,uuid
-import webbrowser as wb
-from json import dumps,loads
+import webbrowser as webb
+import threading as th
 def getuuid(username):
     if exists('.minecraft/usercache.json'):
         with open('.minecraft/usercache.json') as f:
@@ -19,14 +21,14 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','dlout','marg','outlog','bm','gl']
-    ck=[0,256,1,0,0,[],0,0,0]
+    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl']
+    ck=[0,256,1,0,2048,0,0,0]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
             if c=='opt':
                 dic['opt']={}
-                dic['opt']['username']=input('请输入游戏名:')
+                dic['opt']['username']=''
                 dic['opt']['uuid']=getuuid(dic['opt']['username'])
                 dic['opt']['token']=dic['opt']['uuid']
             else: dic[c]=k
@@ -34,94 +36,7 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-def qidong(out=None):
-    v=allv()
-    if v==[]:print('没有可用版本,请先下载');pause();return
-    j=0
-    listprint(v,['序号','版本'])
-    if out:
-        try:n=int(input('输入要生成的序号'))
-        except:return
-    else:
-        try:n=int(input('输入要启动的序号'))
-        except:return
-    try:v[n]=v[n]
-    except:print('输入有误');pause();return
-    if isv(v[n]):
-        j=mcjava(v[n],vdc)
-        try:java=fjava(ls=['mhl/java'],t=1)[j]
-        except:
-            print('未找到java\n1.手动导入\n2.自动下载')
-            sa=input('选择序号:')
-            if sa=='1':
-                java=input(f'java{j}文件夹路径:')
-                if isjavaf(java):
-                    opt[v]=pth
-                    upopt(opt)
-                    java=opt['java'][j]
-                else:
-                    print('无效的java')
-                    pause()
-                    return
-            elif sa=='2':
-                downjava(mcjava(v[n],vdc,m=False),'./mhl/java',opt['thread'])
-                java=fjava(ls=['mhl/java'],t=1)[j]
-            else:return
-        if out:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'],opt['outlog'],v[n]+'.bat',gl=opt['gl'])
-        else:runmc(v[n],vdc,java,opt['opt'],opt['thread'],opt['bqwj'],opt['dlout'],opt['marg'],opt['outlog'],gl=opt['gl'])
-def rmmc():
-    v=allv()
-    if v==[]:print('没有可删除版本');pause();return
-    j=0
-    for i in v:
-        print(j,i)
-        j+=1
-    try:n=int(input('输入要删除的序号'))
-    except:print('输入有误');pause();return
-    try:n=v[n]
-    except:print('输入有误');pause();return
-    n1=input(f'确定删除{n}?(y/n)')
-    if n1=='y':removemc(n,vdc)
-    else:print('已取消操作')
-    pause()
-welc,version='''
-  __  __ _     _                           _               
- |  \/  | |__ | |    __ _ _   _ _ __   ___| |__   ___ _ __ 
- | |\/| | '_ \| |   / _` | | | | '_ \ / __| '_ \ / _ \ '__|
- | |  | | | | | |__| (_| | |_| | | | | (__| | | |  __/ |   
- |_|  |_|_| |_|_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
-
-'''[1:-1],'v0.0.21'
-s='''
-1.下载游戏
-2.启动游戏
-3.导出启动脚本
-4.删除游戏
-0.设置
-'''[1:-1]
-s1='''
-1.最新正式版
-2.最新测试版
-3.查看版本列表
-4.自定义版本
--1.返回
-'''[1:-1]
-s2='''
-1.设置游戏名
-2.设置下载线程
-3.自定义皮肤
-4.自动检查更新设置
-5.查看本程序源代码(github)
-6.查看本程序协议
-7.设置游戏运行内存
-8.补全文件设置
-9.多线程下载输出设置
-10.游戏日志输出设置
-11.设置下载源
-12.版本隔离设置
--1.返回
--2.查看更新日志
-'''[1:-1]
+version='v0.0.23'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
@@ -183,6 +98,11 @@ v0.0.20
 修复了一些bug
 v0.0.21
 修复了一些bug
+v0.0.22
+修复无法自定义内存的bug
+v0.0.23
+添加ui界面!!!!!!!!!!!!!
+修复了一些bug
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -193,102 +113,171 @@ vdc=verdict(sv='mhl')
 print('完成!')
 if opt['check_update']:
     print('正在检查更新')
-    try:check_update(version,'mhl')
+    try:
+        th.Thread(target=check_update,args=(version,'mhl')).start()
     except:print('失败')
-while True:
-    if not exists('.minecraft'):os.mkdir('.minecraft')
-    clear()
-    print(welc)
-    print('MhLauncher mc启动器',version)
-    print('Auther:(炜某晟)_MhwsChina_ 禁止盗版')
-    print(s)
-    a=input('选择序号:')
-    #downloadmc('1.8.9',vdc)
-    #runmc('1.20.1',vdc,r'F:\mc\mcjava\Java\jdk17\bin\javaw.exe',out='1.bat') 691692
-    if a=='2':qidong()
-    if a=='1':
-        print(s1)
-        b=input('选择序号:')
-        if b=='4':
-            ver=input('游戏版本:')
-            if ver=='':continue
-            try:downloadmc(ver,vdc,opt['thread'],opt['dlout'],bm=opt['bm'])
-            except:raise;print('下载失败');pause()
-        if b=='3':
-            printvdc(vdc)
-        if b=='2':
-            try:downloadmc(ov(vdc,'snapshot',1),vdc,opt['thread'],opt['dlout'],bm=opt['bm'])
-            except:print('下载失败');pause()
-        if b=='1':
-            try:downloadmc(ov(vdc,'release',1),vdc,opt['thread'],opt['dlout'],bm=opt['bm'])
-            except:print('下载失败');pause()
-    if a=='3':qidong(True)
-    if a=='4':rmmc()
-    if a=='0':
-        print(s2)
-        b=input('选择序号:')
-        if b=='1':
-            opt['opt']['username']=input('请输入游戏名:');upopt(opt)
-        if b=='2':
-            opt['thread']=input('请输入线程数(默认256,推荐128-512之间最佳)',typ=int);upopt(opt)
-        if b=='3':
-            print('[温馨提示]: 皮肤功能暂未测试,可能无法使用')
-            url=input('皮肤网址(输-1返回):')
-            if url=='-1':continue
-            typ=input('皮肤类型:(steve/alex)',['steve','alex']).upper()
-            ssk={'skins':[{
-                'id':'nul',
-                'state':'ACTIVE',
-                'url':url,
-                'variant':'CLASSIC',
-                'alias':typ
-                }]}
-            opt['opt']=opt['opt'].update(ssk)
-            upopt(opt)
-        if b=='4':
-            print('是否在程序启动时检查更新?')
-            c=input('(输入y表示是,输入n表示否,默认为是)',['n','y'])
-            if c=='y':opt['check_update']=1
-            else:opt['check_update']=0
-            upopt(opt)
-        if b=='5':
-            wb.open('https://github.com/MhwsChina/MhLauncher')
-        if b=='8':
-            c=input('1.快速模式(但不全面)(默认)/2.全面模式(但不快速)/3.返回',['1','2','3'])
-            if c=='1':opt['bqwj']=0
-            if c=='2':opt['bqwj']=1
-            upopt(opt)
-        if b=='9':
-            print('是否在下载时显示下载的文件?')
-            c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
-            if c=='y':opt['dlout']=1
-            else:opt['dlout']=0
-            upopt(opt)
-        if b=='10':
-            print('是否在游戏运行时输出日志?')
-            c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
-            if c=='y':opt['outlog']=1
-            else:opt['outlog']=0
-            upopt(opt)
-        if b=='11':
-            print('选择下载源:\n1.官方源(速度慢,但是最新)\n2.国内源(速度快,但不是最新)(默认)')
-            c=input('请选择序号:')
-            if c=='1':opt['bm']=0
-            else:opt['bm']=1
-            upopt(opt)
-        if b=='12':
-            print('是否启用版本隔离?')
-            print('#启用后,每个mc版本的存档和模组互不相通')
-            c=input('(输入y表示是,输入n表示否,默认为否)',['n','y'])
-            if c=='y':opt['gl']=1
-            else:opt['gl']=0
-            upopt(opt)
-        if b=='-2':
-            print(s3)
-            pause()
-        if b=='6':
-            show_license()
-            pause()
-        if b=='7':
-            opt['marg']=setmem()
-            upopt(opt)
+class main_ui:
+    def __init__(self):
+        self.w=tk.Tk()
+        self.createui()
+    def createui(self):
+        self.w.title('MhLauncher')
+        self.nt0=ttk.Notebook(self.w)
+        self.gm=tk.Frame()
+        self.nt0.add(self.gm,text='启动')
+        self.dl=tk.Frame()
+        self.nt0.add(self.dl,text='下载')
+        self.sett=tk.Frame()
+        self.nt0.add(self.sett,text='设置')
+        self.gy=tk.Frame()
+        self.nt0.add(self.gy,text='关于')
+        #启动界面
+        frml=tk.Frame(self.gm)
+        tk.Label(frml,text='版本列表').pack()
+        self.vers=tk.Listbox(frml,width=50,height=10)
+        self.vers.pack()
+        frml.pack(side='left',anchor='w',padx=10,pady=5)
+        frmne=tk.Frame(self.gm)
+        tk.Label(frmne,text='游戏名').pack(side='top',anchor='center',padx=2,pady=5)
+        self.usbox=tk.Entry(frmne)
+        self.usbox.bind('<Return>',self.setus)
+        self.usbox.pack(side='bottom',anchor='s',padx=2,pady=5)
+        frmne.pack(side='top',anchor='ne',padx=10,pady=5)
+        #获取输入的游戏名self.usbox.get()
+        frmr=tk.Frame(self.gm)
+        #self.vers.grid(row=0,column=0,columnspan=3)
+        tk.Button(frmr,width=20,text='启动',command=lambda: th.Thread(target=self.runmc).start()).grid(row=0,column=0)
+        tk.Button(frmr,width=20,text='删除',command=self.rmmc).grid(row=1,column=0)
+        tk.Button(frmr,width=20,text='导出启动脚本',command=lambda: th.Thread(target=self.runmc,args=(1,)).start()).grid(row=2,column=0)
+        frmr.pack(side='left',anchor='se',padx=10,pady=5)
+        #下载界面
+        frml1=tk.Frame(self.dl)
+        tk.Label(frml1,text='版本列表').pack()
+        self.dlls=tk.Listbox(frml1,width=50,height=10)
+        self.dlls.pack()
+        frml1.pack(side='left',anchor='w',padx=10,pady=5)
+        frm2=tk.Frame(self.dl)
+        self.dltype=tk.StringVar()
+        self.dltype.set('release')
+        tk.Radiobutton(frm2,text='正式版',variable=self.dltype,value='release').grid(row=0,column=0,sticky='w')
+        tk.Radiobutton(frm2,text='测试版',variable=self.dltype,value='snapshot').grid(row=1,column=0,sticky='w')
+        tk.Radiobutton(frm2,text='远古beta版',variable=self.dltype,value='old_beta').grid(row=2,column=0,sticky='w')
+        tk.Radiobutton(frm2,text='远古alpha版',variable=self.dltype,value='old_alpha').grid(row=3,column=0,sticky='w')
+        tk.Button(frm2,text='下载',command=lambda: th.Thread(target=self.dlmc).start()).grid(row=4,sticky='w')
+        tk.Button(frm2,text='刷新',command=self.sxdlls).grid(row=4,column=1,sticky='w')
+        frm2.pack(side='top',anchor='e',padx=10,pady=5)
+        #设置页面
+        self.mb=tk.IntVar()
+        #self.mb.set('1024')
+        frm3=tk.Frame(self.sett)
+        tk.Label(frm3,text='运行内存(mb) 推荐在1024-4096之间').pack(anchor='w')
+        tk.Spinbox(frm3,from_=0,to=32768,increment=1024,textvariable=self.mb).pack(anchor='w')
+        frm3.grid(row=0,column=0,sticky='w')
+        frm4=tk.Frame(self.sett)
+        self.dlth=tk.IntVar()
+        tk.Label(frm4,text='下载线程').pack(anchor='w')
+        tk.Spinbox(frm4,from_=0,to=512,increment=16,textvariable=self.dlth).pack(anchor='w')
+        frm4.grid(row=1,column=0,sticky='w')
+        frm5=tk.Frame(self.sett)
+        tk.Label(frm5,text='下载源').pack(anchor='w')
+        self.bm=tk.IntVar()
+        #self.bm.set('0')
+        tk.Radiobutton(frm5,text='官方(最新,速度快)',variable=self.bm,value=0).pack(anchor='w')
+        tk.Radiobutton(frm5,text='国内(如果官方源下载慢选这个)',variable=self.bm,value=1).pack(anchor='w')
+        frm5.grid(row=2,column=0,sticky='w')
+        frm6=tk.Frame(self.sett)
+        tk.Label(frm6,text='程序启动时检查更新').pack()
+        self.checkup=tk.IntVar()
+        #self.checkup.set('1')
+        tk.Radiobutton(frm6,text='是',variable=self.checkup,value=1).pack(side='left',anchor='w')
+        tk.Radiobutton(frm6,text='否',variable=self.checkup,value=0).pack(side='left',anchor='e')
+        frm6.grid(row=3,column=0,sticky='w')
+        frm7=tk.Frame(self.sett)
+        tk.Label(frm7,text='补全文件设置').pack(anchor='w')
+        self.bqwj=tk.IntVar()
+        tk.Radiobutton(frm7,text='快速',variable=self.bqwj,value=0).pack(side='left',anchor='w')
+        tk.Radiobutton(frm7,text='全面',variable=self.bqwj,value=1).pack(side='left',anchor='e')
+        frm7.grid(row=0,column=1,padx=15)
+        frm8=tk.Frame(self.sett)
+        tk.Label(frm8,text='版本隔离').pack(anchor='w')
+        self.gl=tk.IntVar()
+        tk.Radiobutton(frm8,text='关闭',variable=self.gl,value=0).pack(side='left',anchor='w')
+        tk.Radiobutton(frm8,text='开启',variable=self.gl,value=1).pack(side='left',anchor='e')
+        frm8.grid(row=1,column=1,padx=15)
+        tk.Button(self.sett,text='保存设置',command=self.saveopt).grid(row=3,column=1,sticky='e')
+        #关于
+        tk.Label(self.gy,text=f'MhLauncher {version}').pack(anchor='w')
+        tk.Label(self.gy,text='(c)Copyright 2025 (炜某晟)_MhwsChina_').pack(anchor='w')
+        tk.Button(self.gy,text='查看源代码',command=lambda: webb.open('https://github.com/MhwsChina/MhLauncher')).pack(anchor='w')
+        tk.Label(self.gy,text='更新日志').pack(anchor='w')
+        gxrz=tk.Text(self.gy,width=45,height=8)
+        gxrz.insert('end',s3)
+        gxrz.pack(side='left')
+        tk.Button(self.gy,text='检查更新',command=lambda: th.Thread(target=check_update,args=(version,'mhl',1)).start()).pack(side='left')
+        self.loadopt(opt)
+        self.listver()
+        self.sxdlls()
+        self.nt0.grid(padx=10,pady=5)
+        #获取运行内存self.mb.get()
+        #获取下载线程self.dlth.get()
+        #获取是否国内源self.bm.get()
+        #获取检查更新self.checkup.get()
+        #是否全面补全文件self.bqwj.get()
+        #版本隔离self.gl.get()
+    def runui(self):
+        self.w.mainloop()
+    def loadopt(self,opt):
+        self.dlth.set(opt['thread'])
+        self.mb.set(opt['mb'])
+        self.bm.set(opt['bm'])
+        self.checkup.set(opt['check_update'])
+        self.bqwj.set(opt['bqwj'])
+        self.gl.set(opt['gl'])
+        self.usbox.insert(0,opt['opt']['username'])
+    def saveopt(self):
+        opt['thread']=self.dlth.get()
+        opt['bm']=self.bm.get()
+        opt['check_update']=self.checkup.get()
+        opt['bqwj']=self.bqwj.get()
+        opt['gl']=self.gl.get()
+        opt['mb']=self.mb.get()
+        upopt(opt)
+    def setus(self,event):
+        opt['username']=self.usbox.get()
+        upopt(opt)
+    def runmc(self,out=None):
+        if self.usbox.get()!='':self.setus(1)
+        else:mess.showinfo('提示','请先输入游戏名');return
+        if not self.vers.curselection():
+            mess.showinfo('提示','没有选择版本');return            
+        ver=self.vers.get(self.vers.curselection()[0])
+        if out:out=ver+'.bat'
+        j=mcjava(ver,vdc)
+        try:javaw=fjava(ls=['mhl/java'],t=1)[j]
+        except:
+            downjava(mcjava(ver,vdc,m=False),'./mhl/java',self.dlth.get())
+            javaw=fjava(ls=['mhl/java'],t=1)[j]
+        runmc(ver,vdc,javaw,opt['opt'],self.dlth.get(),self.bqwj.get(),fmmb(self.mb.get()),False,out,self.gl.get(),self.bm.get())
+    def rmmc(self):
+        if not self.vers.curselection():
+            mess.showinfo('提示','没有选择版本');return            
+        ver=self.vers.get(self.vers.curselection()[0])
+        removemc(ver)
+        self.listver()
+    def listver(self):
+        self.vers.delete(0,'end')
+        for i in allv():
+            self.vers.insert('end',i)
+    def dlmc(self):
+        if not self.dlls.curselection():
+            mess.showinfo('提示','没有选择版本');return            
+        ver=self.dlls.get(self.dlls.curselection()[0])
+        print('下载',ver)
+        downloadmc(ver,vdc,self.dlth.get(),self.bm.get(),tk)
+        self.listver()
+    def sxdlls(self):
+        self.dlls.delete(0,'end')
+        for i in ov(vdc,typ=self.dltype.get()):
+            self.dlls.insert('end',i['id'])
+main=main_ui()
+main.runui()
