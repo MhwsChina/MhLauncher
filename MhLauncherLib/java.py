@@ -1,6 +1,7 @@
 import platform,os
 from json import loads,dumps
 import requests as rq
+import tkinter as tk
 from .xcdl import *
 from .log import *
 def ifarm():
@@ -39,4 +40,5 @@ def downjava(name,path='',dlthread=128):
                 if 'raw' in j['downloads']:
                     u.append(j['downloads']['raw']['url'])
                     p.append(pj(path,i))
-    xcdnld(u,p,dlthread)
+    xcdnld(u,p,dlthread,tk,'安装java')
+    joindl()

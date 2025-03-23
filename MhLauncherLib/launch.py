@@ -4,8 +4,10 @@ from .args import *
 from json import loads,dumps
 import subprocess as sub
 import os,zipfile,hashlib,uuid,random,platform
-import threading as th
 import shutil as sht
+import tkinter as tk
+import tkinter.messagebox as mess
+import threading as th
 def javart():
     if platform.system() == 'Windows':
         return 'javaw.exe'
@@ -43,19 +45,21 @@ def verdict(sv='.minecraft'):
     with open(pj(sv,'version.json'),'w') as f:
         f.write(dumps(v))
     return v
-def setmem(opt):
+def setmem():
     s=input('1.自定义/2.自动分配',['1','2'])
     if s=='1':
         b='M' if input('1.mb/2.gb',['1','2'])=='1' else 'G'
         c=str(input('大小:',typ=int))
         return ['-Xmx'+c+b,'-Xmn'+c+b]
     return []
-def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,dlout=0,marg=[],outlog=False,out=None,d='.minecraft',gl=False):
+def fmmb(c):
+    return ['-Xmx'+str(c)+'M','-Xmn'+'256'+'M']
+def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,marg=[],outlog=False,out=None,gl=False,bm=False,d='.minecraft'):
     print('正在补全文件...')
     dc=readv(ver)
     if 'inheritsFrom' in dc:
-        bqwj(dc['inheritsFrom'],vdc,d,bqthread,sha,dlout)
-    bqwj(ver,vdc,d,bqthread,sha,dlout)
+        bqwj(dc['inheritsFrom'],vdc,d,bqthread,sha)
+    bqwj(ver,vdc,d,bqthread,sha)
     print('完成!')
     if not o:o=testplayer()
     if not 'javaw' in javaw:
@@ -66,15 +70,12 @@ def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,dlout=0,marg=[],outlog=False,o
         cmd[0]='"{}"'.format(cmd[0].replace('"',''))
         with open(out,'w',encoding='utf-8') as f:
             f.write(' '.join(cmd))
-            print('导出启动脚本完成')
+            mess.showinfo('awa','导出启动脚本完成')
     else:
         print('正在启动',ver)
-        if outlog:sub.run(cmd)
-        else:
-            th.Thread(target=sub.run,args=([cmd])).start()
-            print('启动完成,游戏窗口等下会出现')
-    pause()
-def bqwj(ver,vdc,di,thread,sha=0,out=0):
+        th.Thread(target=mess.showinfo,args=('awa','启动成功,游戏窗口待会出现')).start()
+        sub.call(cmd)
+def bqwj(ver,vdc,di,thread,sha=0):
     f=pj(di,'versions/'+ver+'/'+ver+'.json')
     f=open(f,'r')
     d=loads(f.read())
@@ -90,7 +91,9 @@ def bqwj(ver,vdc,di,thread,sha=0,out=0):
     for i in range(len(uu)):
         u,p=uu[i],pp[i]
         if not exists(p):uss.append(u);pss.append(p)
-    if not uss==[]:xcdnld(uss,pss,thread,out)
+    if not uss==[]:
+        xcdnld(uss,pss,thread,tk,'补全文件')
+        joindl()
     for l in d['libraries']:
         if 'downloads' not in l:continue
         if 'classifiers' in l['downloads']:
@@ -178,7 +181,7 @@ def mcjava(v,vd,d='.minecraft',m=True):
         if mvv[0]>=dc['21']:return '21'"""
     if m:return str(dc['javaVersion']['majorVersion'])
     else:return str(dc['javaVersion']['component'])
-def removemc(ver,vdc,d='.minecraft'):
+def removemc(ver,d='.minecraft'):
     p=pj(d,'versions/'+ver)
     if exists(p):
         sht.rmtree(p)

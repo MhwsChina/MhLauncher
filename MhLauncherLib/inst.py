@@ -147,7 +147,7 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False):
             if bq:sha1s.append(obj['hash'])
     if bq:return us,ps,uu,pp,sha1s
     return us,ps
-def downloadmc(ver,vdc,thread=128,dlout=0,bm=False,d='.minecraft'):
+def downloadmc_noui(ver,vdc,thread=128,dlout=0,bm=False,d='.minecraft'):
     print('开始下载',ver)
     urls,paths=gtmcurl(ver,vdc,d,bm)
     print('开始下载资源文件')
@@ -155,3 +155,6 @@ def downloadmc(ver,vdc,thread=128,dlout=0,bm=False,d='.minecraft'):
     #asyncio.run(asyncdl(urls,paths,300))
     print(ver,'下载完成')
     pause()
+def downloadmc(ver,vdc,thread,bm=False,tk=None,d='.minecraft'):
+    urls,paths=gtmcurl(ver,vdc,d,bm)
+    xcdnld(urls,paths,thread,tk,'下载游戏')
