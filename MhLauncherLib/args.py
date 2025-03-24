@@ -118,7 +118,12 @@ def getjvm(v,ver,classpath,opt,d,gmdir):
                     args.append(fmarg(i,ver,classpath,v,opt,gmdir,d))
                 else:
                     if 'rules' in i and not parsel(i['rules']):continue
-                    args.append(i['value'])
+                    value=i['value']
+                    if type(value)==list:
+                        for ii in value: 
+                            args.append(ii)
+                    else:
+                        args.append(value)
     elif 'jvmArguments' in v:
         args=args+v['jvmArguments']
     else:

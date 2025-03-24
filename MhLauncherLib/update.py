@@ -31,5 +31,6 @@ def check_update(now_version,save_path='',oot=0,write_path=sys.argv[0],api_url='
         f.close()
         os.remove(p)
         mess.showinfo('awa','已更新到最新版本!请重启程序')
+        os._exit(0)
     else:
         if oot:mess.showinfo('o_o','已经是最新版本了')
