@@ -37,7 +37,7 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.25'
+version='v0.0.26'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
@@ -108,6 +108,9 @@ v0.0.24
 修复了一些bug
 v0.0.25
 优化UI
+v0.0.26
+修复检查更新UI的bug
+修复不能启动1.16版本mc的bug
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
