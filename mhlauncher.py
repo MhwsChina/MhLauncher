@@ -4,6 +4,7 @@ import tkinter.messagebox as mess
 from MhLauncherLib import *
 import webbrowser as webb
 import threading as th
+import os
 def getuuid(username):
     if exists('.minecraft/usercache.json'):
         with open('.minecraft/usercache.json') as f:
@@ -36,7 +37,7 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.24'
+version='v0.0.25'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
@@ -105,6 +106,8 @@ v0.0.23
 修复了一些bug
 v0.0.24
 修复了一些bug
+v0.0.25
+优化UI
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -122,8 +125,41 @@ class main_ui:
     def __init__(self):
         self.w=tk.Tk()
         self.createui()
+    def mousep(self,event):
+        self.X=event.x
+        self.Y=event.y
+    def mouser(self,event):
+        self.X=0
+        self.Y=0
+    def mousem(self,event):
+        dx=event.x-self.X
+        dy=event.y-self.Y
+        nx=self.w.winfo_x()+dx
+        ny=self.w.winfo_y()+dy
+        self.w.geometry(f'+{nx}+{ny}')
+    def exit(self):
+        os._exit(0)
+    def iconify(self):
+        self.w.overrideredirect(False)
+        self.w.iconify()
+        self.w.overrideredirect(True)
+    def zhiding(self):
+        while 1:
+            if self.zd.get():self.w.attributes('-topmost',1)
+            else:self.w.attributes('-topmost',0)
+            sleep(0.05)
     def createui(self):
         self.w.title('MhLauncher')
+        self.w.overrideredirect(True)
+        self.w.resizable(0, 0)
+        self.w.geometry('+0+0')
+        self.w.bind('<ButtonPress-1>',self.mousep)
+        self.w.bind('<ButtonRelease-1>',self.mouser)
+        self.w.bind("<B1-Motion>",self.mousem)
+        closew=tk.Frame(self.w)
+        tk.Button(closew,text='-',bd=0,command=self.iconify).grid(row=0,column=0,padx=10)
+        tk.Button(closew,text='x',bd=0,command=self.exit).grid(row=0,column=1,padx=10)
+        closew.grid(row=0,column=0,sticky='ne')
         self.nt0=ttk.Notebook(self.w)
         self.gm=tk.Frame()
         self.nt0.add(self.gm,text='启动')
@@ -206,6 +242,12 @@ class main_ui:
         tk.Radiobutton(frm8,text='关闭',variable=self.gl,value=0).pack(side='left',anchor='w')
         tk.Radiobutton(frm8,text='开启',variable=self.gl,value=1).pack(side='left',anchor='e')
         frm8.grid(row=1,column=1,padx=15)
+        frm9=tk.Frame(self.sett)
+        tk.Label(frm9,text='窗口置顶').pack(anchor='w')
+        self.zd=tk.IntVar()
+        tk.Radiobutton(frm9,text='关闭',variable=self.zd,value=0).pack(side='left',anchor='w')
+        tk.Radiobutton(frm9,text='开启',variable=self.zd,value=1).pack(side='left',anchor='e')
+        frm9.grid(row=2,column=1,padx=15)
         tk.Button(self.sett,text='保存设置',command=self.saveopt).grid(row=3,column=1,sticky='e')
         #关于
         tk.Label(self.gy,text=f'MhLauncher {version}').pack(anchor='w')
@@ -219,7 +261,8 @@ class main_ui:
         self.loadopt(opt)
         self.listver()
         self.sxdlls()
-        self.nt0.grid(padx=10,pady=5)
+        self.nt0.grid(row=1,column=0,padx=10,pady=5)
+        th.Thread(target=self.zhiding).start()
         #获取运行内存self.mb.get()
         #获取下载线程self.dlth.get()
         #获取是否国内源self.bm.get()
