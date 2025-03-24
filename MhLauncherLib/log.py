@@ -11,6 +11,7 @@ def input(txt='',ls=[],typ=str,err='输入不正确,请重新输入!'):
     return tmp
 pprint=print
 def print(*args,end='\n'):
+    return
     sys.stdout.write(' '.join(map(str,[*args]))+end)
 def log(*args,mode='INFO'):
     txt=' '.join([*args])
