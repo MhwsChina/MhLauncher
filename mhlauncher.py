@@ -37,10 +37,24 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.26'
+version='v0.0.27'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.27
+新增安装Fabric选项
+(但是要装好久)
+v0.0.26
+修复检查更新UI的bug
+修复不能启动1.16版本mc的bug
+v0.0.25
+优化UI
+v0.0.24
+修复了一些bug
+v0.0.23
+添加ui界面!!!!!!!!!!!!!
+修复了一些bug
+====旧版本日志===
 v0.0.1
 支持启动mc,下载mc
 v0.0.2
@@ -101,16 +115,6 @@ v0.0.21
 修复了一些bug
 v0.0.22
 修复无法自定义内存的bug
-v0.0.23
-添加ui界面!!!!!!!!!!!!!
-修复了一些bug
-v0.0.24
-修复了一些bug
-v0.0.25
-优化UI
-v0.0.26
-修复检查更新UI的bug
-修复不能启动1.16版本mc的bug
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -155,12 +159,14 @@ class main_ui:
         self.w.title('MhLauncher')
         self.w.overrideredirect(True)
         self.w.resizable(0, 0)
-        self.w.geometry('+0+0')
+        x=int((self.w.winfo_screenwidth()-self.w.winfo_reqwidth())/2)
+        y=int((self.w.winfo_screenheight()-self.w.winfo_reqheight())/2)
+        self.w.geometry(f'+{x}+{y}')
         self.w.bind('<ButtonPress-1>',self.mousep)
         self.w.bind('<ButtonRelease-1>',self.mouser)
         self.w.bind("<B1-Motion>",self.mousem)
         closew=tk.Frame(self.w)
-        tk.Button(closew,text='-',bd=0,command=self.iconify).grid(row=0,column=0,padx=10)
+        #tk.Button(closew,text='-',bd=0,command=self.iconify).grid(row=0,column=0,padx=10)
         tk.Button(closew,text='x',bd=0,command=self.exit).grid(row=0,column=1,padx=10)
         closew.grid(row=0,column=0,sticky='ne')
         self.nt0=ttk.Notebook(self.w)
@@ -172,6 +178,8 @@ class main_ui:
         self.nt0.add(self.sett,text='设置')
         self.gy=tk.Frame()
         self.nt0.add(self.gy,text='关于')
+        self.fb=tk.Frame()
+        self.nt0.add(self.fb,text='安装fabric')
         #启动界面
         frml=tk.Frame(self.gm)
         tk.Label(frml,text='版本列表').pack()
@@ -200,12 +208,11 @@ class main_ui:
         frm2=tk.Frame(self.dl)
         self.dltype=tk.StringVar()
         self.dltype.set('release')
-        tk.Radiobutton(frm2,text='正式版',variable=self.dltype,value='release').grid(row=0,column=0,sticky='w')
-        tk.Radiobutton(frm2,text='测试版',variable=self.dltype,value='snapshot').grid(row=1,column=0,sticky='w')
-        tk.Radiobutton(frm2,text='远古beta版',variable=self.dltype,value='old_beta').grid(row=2,column=0,sticky='w')
-        tk.Radiobutton(frm2,text='远古alpha版',variable=self.dltype,value='old_alpha').grid(row=3,column=0,sticky='w')
+        tk.Radiobutton(frm2,text='正式版',variable=self.dltype,value='release',command=self.sxdlls).grid(row=0,column=0,sticky='w')
+        tk.Radiobutton(frm2,text='测试版',variable=self.dltype,value='snapshot',command=self.sxdlls).grid(row=1,column=0,sticky='w')
+        tk.Radiobutton(frm2,text='远古beta版',variable=self.dltype,value='old_beta',command=self.sxdlls).grid(row=2,column=0,sticky='w')
+        tk.Radiobutton(frm2,text='远古alpha版',variable=self.dltype,value='old_alpha',command=self.sxdlls).grid(row=3,column=0,sticky='w')
         tk.Button(frm2,text='下载',command=lambda: th.Thread(target=self.dlmc).start()).grid(row=4,sticky='w')
-        tk.Button(frm2,text='刷新',command=self.sxdlls).grid(row=4,column=1,sticky='w')
         frm2.pack(side='top',anchor='e',padx=10,pady=5)
         #设置页面
         self.mb=tk.IntVar()
@@ -261,6 +268,13 @@ class main_ui:
         gxrz.insert('end',s3)
         gxrz.pack(side='left')
         tk.Button(self.gy,text='检查更新',command=lambda: th.Thread(target=check_update,args=(version,'mhl',1)).start()).pack(side='left')
+        #fabric界面
+        frm10=tk.Frame(self.fb)
+        tk.Label(frm10,text='版本列表').pack()
+        self.vers1=tk.Listbox(frm10,width=50,height=10)
+        self.vers1.pack()
+        frm10.grid(column=0,row=0,padx=10,pady=5)
+        tk.Button(self.fb,text='安装',command=lambda: th.Thread(target=self.fabric).start()).grid(column=1,row=0,padx=10,pady=5)
         self.loadopt(opt)
         self.listver()
         self.sxdlls()
@@ -306,6 +320,19 @@ class main_ui:
             downjava(mcjava(ver,vdc,m=False),'./mhl/java',self.dlth.get())
             javaw=fjava(ls=['mhl/java'],t=1)[j]
         runmc(ver,vdc,javaw,opt['opt'],self.dlth.get(),self.bqwj.get(),fmmb(self.mb.get()),False,out,self.gl.get(),self.bm.get())
+    def fabric(self): 
+        if not self.vers1.curselection():
+            mess.showinfo('提示','没有选择版本');return            
+        ver=self.vers1.get(self.vers1.curselection()[0])
+        java='java-runtime-gamma-snapshot'
+        try:javaw=fjava(ls=['mhl/java'],t=1)['17']
+        except:
+            downjava(java,'./mhl/java',self.dlth.get())
+            javaw=fjava(ls=['mhl/java'],t=1)['17']
+        #javaw=javaw.replace('javaw','java')
+        fabric(ver,javaw,'mhl')
+        self.listver()
+        mess.showinfo('安装Fabric',f'fabric{ver}已成功安装')
     def rmmc(self):
         if not self.vers.curselection():
             mess.showinfo('提示','没有选择版本');return            
@@ -314,8 +341,10 @@ class main_ui:
         self.listver()
     def listver(self):
         self.vers.delete(0,'end')
+        self.vers1.delete(0,'end')
         for i in allv():
             self.vers.insert('end',i)
+            self.vers1.insert('end',i)
     def dlmc(self):
         if not self.dlls.curselection():
             mess.showinfo('提示','没有选择版本');return            
