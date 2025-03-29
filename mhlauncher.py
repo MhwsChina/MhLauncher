@@ -22,8 +22,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl']
-    ck=[0,256,1,0,2048,0,0,0]
+    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl','zd']
+    ck=[0,256,1,0,2048,0,0,0,10]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -37,10 +37,14 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.27'
+version='v0.0.28'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.28
+新增安装Forge选项
+安装模组(将在v0.0.29实现)
+修复了一些bug
 v0.0.27
 新增安装Fabric选项
 (但是要装好久)
@@ -179,7 +183,7 @@ class main_ui:
         self.gy=tk.Frame()
         self.nt0.add(self.gy,text='关于')
         self.fb=tk.Frame()
-        self.nt0.add(self.fb,text='安装fabric')
+        self.nt0.add(self.fb,text='安装fabric/forge')
         #启动界面
         frml=tk.Frame(self.gm)
         tk.Label(frml,text='版本列表').pack()
@@ -273,8 +277,13 @@ class main_ui:
         tk.Label(frm10,text='版本列表').pack()
         self.vers1=tk.Listbox(frm10,width=50,height=10)
         self.vers1.pack()
-        frm10.grid(column=0,row=0,padx=10,pady=5)
+        frm10.grid(column=0,row=0,padx=10,pady=5,rowspan=2)
         tk.Button(self.fb,text='安装',command=lambda: th.Thread(target=self.fabric).start()).grid(column=1,row=0,padx=10,pady=5)
+        frm11=tk.Frame(self.fb)
+        self.isfg=tk.IntVar()
+        tk.Radiobutton(frm11,text='fabric',variable=self.isfg,value=0).pack()
+        tk.Radiobutton(frm11,text='forge',variable=self.isfg,value=1).pack()
+        frm11.grid(column=1,row=1,padx=10,pady=5)
         self.loadopt(opt)
         self.listver()
         self.sxdlls()
@@ -296,6 +305,7 @@ class main_ui:
         self.bqwj.set(opt['bqwj'])
         self.gl.set(opt['gl'])
         self.usbox.insert(0,opt['opt']['username'])
+        self.zd.set(opt['zd'])
     def saveopt(self):
         opt['thread']=self.dlth.get()
         opt['bm']=self.bm.get()
@@ -303,6 +313,7 @@ class main_ui:
         opt['bqwj']=self.bqwj.get()
         opt['gl']=self.gl.get()
         opt['mb']=self.mb.get()
+        opt['zd']=self.zd.get()
         upopt(opt)
     def setus(self,event):
         opt['opt']['username']=self.usbox.get()
@@ -330,9 +341,11 @@ class main_ui:
             downjava(java,'./mhl/java',self.dlth.get())
             javaw=fjava(ls=['mhl/java'],t=1)['17']
         #javaw=javaw.replace('javaw','java')
-        fabric(ver,javaw,'mhl')
+        th.Thread(target=mess.showinfo,args=('安装Fabric/Forge','已开始安装,过程可能需要一两分钟,请耐心等待')).start()
+        if self.isfg.get():forge(ver,'mhl');ver='Forge'+ver
+        else:fabric(ver,javaw,'mhl');ver='Fabric'+ver
         self.listver()
-        mess.showinfo('安装Fabric',f'fabric{ver}已成功安装')
+        mess.showinfo('安装Fabric/Forge',f'{ver}已成功安装')
     def rmmc(self):
         if not self.vers.curselection():
             mess.showinfo('提示','没有选择版本');return            
