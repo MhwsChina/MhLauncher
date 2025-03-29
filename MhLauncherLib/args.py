@@ -1,4 +1,3 @@
-from .log import *
 import os,platform,re
 from json import loads
 def pj(*args):
@@ -110,7 +109,7 @@ def fmarg(txt,ver,classpath,v,opt,gmdir,d='.minecraft'):
 def getjvm(v,ver,classpath,opt,d,gmdir):
     args=[]
     if 'inheritsFrom' in v:
-        args=args+getjvm(readv(v['inheritsFrom'],d),ver,classpath,opt,d,gmdir)
+        args=args+getjvm(readv(v['inheritsFrom'],d),v['inheritsFrom'],classpath,opt,d,gmdir)
     elif 'arguments' in v:
         if 'jvm' in v['arguments']:
             for i in v['arguments']['jvm']:
@@ -135,7 +134,7 @@ def getjvm(v,ver,classpath,opt,d,gmdir):
 def getgame(v,ver,classpath,opt,d,gmdir):
     args=[]
     if 'inheritsFrom' in v:
-        return getgame(readv(v['inheritsFrom'],d),ver,classpath,opt,d,gmdir)
+        args=args+getgame(readv(v['inheritsFrom'],d),v['inheritsFrom'],classpath,opt,d,gmdir)
     if 'arguments' in v:
         if 'game' in v['arguments']:
             for i in v['arguments']['game']:

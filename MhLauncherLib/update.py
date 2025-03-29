@@ -4,7 +4,7 @@ import sys,os,shutil
 from .xcdl import *
 from .log import *
 import tkinter.messagebox as mess
-def check_update(now_version,save_path='',oot=0,write_path=sys.argv[0],api_url='https://api.github.com/repos/MhwsChina/MhLauncher/tags',dlurl='https://github.com/MhwsChina/MhLauncher/releases/download/%tagver%/Launcher.exe',timeout=10):
+def check_update(now_version,save_path='',oot=0,write_path=sys.argv[0],api_url='https://api.github.com/repos/MhwsChina/MhLauncher/tags',dlurl='https://github.com/MhwsChina/MhLauncher/releases/download/%tagver%/Launcher.exe',timeout=5):
     req.packages.urllib3.disable_warnings()
     i=0
     for i in range(3):
@@ -19,7 +19,7 @@ def check_update(now_version,save_path='',oot=0,write_path=sys.argv[0],api_url='
     n1=list(map(int,now_version.replace('v','').split('.')))
     p=pj(save_path,'update.tmp')
     if n[0]>n1[0] or n[1]>n1[1] or n[2]>n1[2]:
-        ur=['https://ghf.xn--eqrr82bzpe.top/','https://github.moeyy.xyz/']
+        ur=['https://github.moeyy.xyz/','https://ghf.xn--eqrr82bzpe.top/']
         for i in ur:
             try:dnld(i+dlurl.replace('%tagver%',latest['name']),p)
             except:pass

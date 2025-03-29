@@ -10,7 +10,7 @@ import tkinter.messagebox as mess
 import threading as th
 def javart():
     if platform.system() == 'Windows':
-        return 'javaw.exe'
+        return 'java.exe'
     if platform.system() == 'Darwin':
         return 'java'
     if platform.system()=='Linux':
@@ -74,7 +74,7 @@ def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,marg=[],outlog=False,out=None,
     else:
         print('正在启动',ver)
         th.Thread(target=mess.showinfo,args=('awa','启动成功,游戏窗口待会出现')).start()
-        sub.call(cmd)
+        sub.call(cmd,creationflags=sub.CREATE_NO_WINDOW)
 def bqwj(ver,vdc,di,thread,sha=0):
     f=pj(di,'versions/'+ver+'/'+ver+'.json')
     f=open(f,'r')
