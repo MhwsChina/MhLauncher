@@ -1,5 +1,6 @@
 import re
 from .xcdl import *
+from .inst import *
 import subprocess as sub
 import os,zipfile,platform,tempfile
 from json import loads
@@ -99,7 +100,8 @@ def forge_processors(data,minecraft_directory,lzma_path,installer_path,java,call
             for c in i["classpath"]:
                 classpath = classpath + get_library_path(c, path) + classpath_seperator
             classpath = classpath + get_library_path(i["jar"], path)
-            mainclass = get_jar_mainclass(get_library_path(i["jar"], path))
+            try:mainclass = get_jar_mainclass(get_library_path(i["jar"], path))
+            except:continue
             command = [java, "-cp", classpath, mainclass]
             for c in i["args"]:
                 var = argument_vars.get(c, c)
@@ -135,6 +137,8 @@ def forge(v,java,p='.minecraft',d='.minecraft'):
     lmza_path=pj(p,f'client{rdt()}.lzma')
     try:extract(zf,'data/client.lzma',lmza_path)
     except:pass
+    us,ps=libraries(data,0,0)
+    xcdnld(us,ps,256)
     forge_processors(data,d,lmza_path,path,java,{})
     zf.close()
     os.remove(path)

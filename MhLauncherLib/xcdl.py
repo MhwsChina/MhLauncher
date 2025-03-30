@@ -10,7 +10,7 @@ def pj(*args):
     return os.path.join(*args).replace('\\','/')
 def exists(p):
     return os.path.exists(p)
-def dnld(url,path,timeout=20):
+def dnld(url,path,timeout=20,trys=0):
     try:
         res=rq.get(url,timeout=timeout)
         try:os.makedirs(os.path.split(path)[0])
@@ -19,7 +19,8 @@ def dnld(url,path,timeout=20):
             f.write(res.content)
         res=None
     except:
-        dnld(url,path,timeout)
+        if trys==4:return
+        dnld(url,path,timeout,trys+1)
 def onednld(url,path,timeout=20,chunk_size=1048576,r=None,rs=0):
     try:
         res=rq.get(url,timeout=timeout,stream=True)
