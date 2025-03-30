@@ -38,10 +38,12 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.30'
+version='v0.0.31'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.31
+修复了一些bug
 v0.0.30
 修复了启动forge之后闪退的bug
 若还闪退请重新安装forge
