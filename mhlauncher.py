@@ -38,10 +38,13 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.29'
+version='v0.0.30'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.30
+修复了启动forge之后闪退的bug
+若还闪退请重新安装forge
 v0.0.29
 删除旧版本日志
 增加安装模组的功能
@@ -314,7 +317,7 @@ class main_ui:
             javaw=fjava(ls=['mhl/java'],t=1)['17']
         #javaw=javaw.replace('javaw','java')
         th.Thread(target=mess.showinfo,args=('安装Fabric/Forge','已开始安装,过程可能需要一两分钟,请耐心等待')).start()
-        if self.isfg.get():forge(ver,'mhl');ver='Forge'+ver
+        if self.isfg.get():forge(ver,javaw,'mhl');ver='Forge'+ver
         else:fabric(ver,javaw,'mhl');ver='Fabric'+ver
         self.listver()
         mess.showinfo('安装Fabric/Forge',f'{ver}已成功安装')
