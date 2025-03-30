@@ -11,19 +11,64 @@ follows(作者)关注数量
 newest发布日期
 updated更新日期
 '''
-def searchmod(mod=None,limit=20,index='downloads',timeout=10) -> dict:
+def searchmod(mod=None,limit=20,index='downloads',timeout=10) -> list:
     url=f'https://api.modrinth.com/v2/search?limit={limit}&index={index}'
     if mod:url+=f'&query={mod}'
     url+='&facets=%5B%5B%22project_type%3Amod%22%5D%5D'
     rs=req.get(url,timeout=timeout)
-    return rs.json()
-def modurl(mod,mcver,loader='fabric',timeout=10) -> tuple:
+    return rs.json()['hits']
+def modurl(mod,mcver,loader=None,timeout=10) -> tuple:
     url=f'https://api.modrinth.com/v2/project/{mod}/version'
     rs=req.get(url,timeout=timeout)
     dic=rs.json()
+    loaders=[]
     for i in dic:
+        if not loader:
+            if mcver in i['game_versions']:
+                for j in i['loaders']:
+                    if not j in loaders:
+                        loaders.append(j)
         if mcver in i['game_versions'] and loader in i['loaders']:
             files=[]
             for file in i['files']:
                 files.append((file['url'],file['filename'],file['hashes']))
-            return (files,i['project_id'],i['id'])
+            return (files,i['project_id'],i['id'],i['loaders'])
+    return loaders
+def formatsc(sd) -> list:
+    ls=[]
+    for i in sd:
+        ls.append((i['title'],i['versions'],i['slug'],i['icon_url']))
+    return ls
+'''
+modurl(mod,mcver,loader) -> tuple
+(
+    files -> list
+    [
+        (
+            url->str,
+            filename->str,
+            sha->dict
+            {
+                'sha1':str,
+                'sha256':str,
+                'sha2':str,
+                ...
+            }
+        )
+    ],
+    project_id,
+    id,
+    modloaders->list['fabric','forge'.......],
+)
+#mod=modname
+formatsc(sd) -> list
+[
+    (
+        modtitle->str,
+        mcversions->list['1.20.1','1.21'.......],
+        modname->str,
+        modiconurl->str
+    )
+]
+#sd=searchmod()
+'''
