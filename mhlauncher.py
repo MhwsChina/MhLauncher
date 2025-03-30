@@ -1,10 +1,11 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as mess
+from tkinter import filedialog
 from MhLauncherLib import *
 import webbrowser as webb
 import threading as th
-import os
+import os,sys
 def getuuid(username):
     if exists('.minecraft/usercache.json'):
         with open('.minecraft/usercache.json') as f:
@@ -37,10 +38,13 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.28'
+version='v0.0.29'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.29
+删除旧版本日志
+增加安装模组的功能
 v0.0.28
 新增安装Forge选项
 安装模组(将在v0.0.29实现)
@@ -58,67 +62,6 @@ v0.0.24
 v0.0.23
 添加ui界面!!!!!!!!!!!!!
 修复了一些bug
-====旧版本日志===
-v0.0.1
-支持启动mc,下载mc
-v0.0.2
-优化多线程下载
-自定义皮肤
-自动安装java
-优化导出启动脚本
-v0.0.3
-解决无法在无网络下启动mc的问题
-增加自动更新
-v0.0.4
-支持查看协议
-优化兼容性
-补全文件更加快速
-优化自动更新
-v0.0.5
-修复了一些bug
-增添自定义游戏运行内存功能
-v0.0.6
-优化自动更新
-补全文件更新
-v0.0.7
-优化多线程下载
-v0.0.8
-支持启动fabric,forge
-重构,重写启动游戏代码(花了好长时间)
-重写导出启动脚本代码
-不再需要minecraft-launcher-lib
-优化检测java代码
-v0.0.9
-多线程下载修复了一个bug
-v0.0.10
-修复了一些bug
-v0.0.11
-修复了很多bug
-v0.0.12
-优化下载mc
-v0.0.13
-加入bmclapi下载源
-v0.0.14
-下载更加迅速
-v0.0.15
-紧急修复一些bug
-v0.0.16
-修复了一些bug
-v0.0.17
-修复了一些bug
-v0.0.18
-支持windows,macos,linux等各种系统
-只要能装python就能启动
-v0.0.19
-加入版本隔离
-修复了很多bug
-更换更新源
-v0.0.20
-修复了一些bug
-v0.0.21
-修复了一些bug
-v0.0.22
-修复无法自定义内存的bug
 '''[1:-1]
 print('正在加载配置文件...')
 opt=init()
@@ -134,6 +77,7 @@ if opt['check_update']:
     except:print('失败')
 class main_ui:
     def __init__(self):
+        self.tmpa,self.tmpb,self.tmpc=0,0,0
         self.w=tk.Tk()
         self.createui()
     def mousep(self,event):
@@ -184,6 +128,8 @@ class main_ui:
         self.nt0.add(self.gy,text='关于')
         self.fb=tk.Frame()
         self.nt0.add(self.fb,text='安装fabric/forge')
+        self.modd=tk.Frame()
+        self.nt0.add(self.modd,text='下载mod')
         #启动界面
         frml=tk.Frame(self.gm)
         tk.Label(frml,text='版本列表').pack()
@@ -284,11 +230,37 @@ class main_ui:
         tk.Radiobutton(frm11,text='fabric',variable=self.isfg,value=0).pack()
         tk.Radiobutton(frm11,text='forge',variable=self.isfg,value=1).pack()
         frm11.grid(column=1,row=1,padx=10,pady=5)
+        #mod页面
+        frm12=tk.Frame(self.modd)
+        self.labela=tk.Label(frm12,text='模组列表')
+        self.labela.pack()
+        self.mods=tk.Listbox(frm12,width=50,height=10)
+        self.mods.pack()
+        frm12.grid(row=0,column=0,padx=10,pady=5)
+        self.ssnum=tk.IntVar()
+        frm13=tk.Frame(self.modd)
+        tk.Label(frm13,text='搜索数量').pack()
+        tk.Spinbox(frm13,from_=1,to=60,textvariable=self.ssnum).pack()
+        self.ssnum.set(20)
+        tk.Label(frm13,text='排序方法').pack()
+        self.pxff=tk.StringVar()
+        tk.Spinbox(frm13,textvariable=self.pxff,values=('关联','下载量','(作者)关注数量','发布日期','更新日期')[::-1]).pack()
+        self.pxff.set('下载量')
+        tk.Label(frm13,text='搜索内容').pack()
+        self.sstext=tk.Entry(frm13)
+        self.sstext.pack()
+        self.buttona=tk.StringVar()
+        self.buttona.set('选择')
+        tk.Button(frm13,text='搜索',command=self.searchmod).pack()
+        tk.Button(frm13,textvariable=self.buttona,command=self.dlmod).pack()
+        frm13.grid(row=0,column=1,padx=10,pady=5)
+        #######################
         self.loadopt(opt)
         self.listver()
         self.sxdlls()
         self.nt0.grid(row=1,column=0,padx=10,pady=5)
         th.Thread(target=self.zhiding).start()
+        th.Thread(target=self.searchmod).start()
         #获取运行内存self.mb.get()
         #获取下载线程self.dlth.get()
         #获取是否国内源self.bm.get()
@@ -369,5 +341,52 @@ class main_ui:
         self.dlls.delete(0,'end')
         for i in ov(vdc,typ=self.dltype.get()):
             self.dlls.insert('end',i['id'])
+    def searchmod(self):
+        dc={'关联':'relevance','下载量':'downloads','(作者)关注数量':'follows','发布日期':'newest','更新日期':'updated'}
+        px=dc[self.pxff.get()]
+        ssnum=self.ssnum.get()
+        mod=self.sstext.get()
+        self.mods.delete(0,'end')
+        self.modss=formatsc(searchmod(mod,ssnum,px))
+        for i in self.modss:
+            self.mods.insert('end',i[0])
+    def dlmod(self):
+        if self.tmpa==0:
+            if not self.mods.curselection():
+                mess.showinfo('提示','没有选择mod');return
+            self.tmpa=1
+            self.labela['text']='mc版本'
+            self.tmpb=self.modss[self.mods.curselection()[0]][2]
+            tmp=self.modss[self.mods.curselection()[0]][1]
+            self.modss[self.mods.curselection()[0]][1]
+            self.mods.delete(0,'end')
+            for i in tmp:
+                self.mods.insert(0,i)
+            return
+        if self.tmpa==1:
+            if not self.mods.curselection():
+                mess.showinfo('提示','没有选择mc版本');return
+            self.tmpa=2
+            self.buttona.set('下载')
+            self.labela['text']='mod加载器'
+            self.tmpc=self.mods.get(self.mods.curselection()[0]) 
+            self.mods.delete(0,'end')
+            for i in modurl(self.tmpb,self.tmpc):
+                self.mods.insert('end',i)
+            return
+        if self.tmpa==2:
+            if not self.mods.curselection():
+                mess.showinfo('提示','没有选择mod加载器');return
+            loader=self.mods.get(self.mods.curselection()[0])
+            p=filedialog.askdirectory()
+            mu=modurl(self.tmpb,self.tmpc,loader)
+            for file in mu[0]:
+                dnld(file[0],pj(p,file[1]))
+            self.tmpa=0
+            self.buttona.set('选择')
+            self.labela['text']='模组列表'
+            th.Thread(target=self.searchmod).start()
+            mess.showinfo('安装模组','下载完成!')
+            return
 main=main_ui()
 main.runui()
