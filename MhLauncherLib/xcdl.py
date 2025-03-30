@@ -34,8 +34,8 @@ def onednld(url,path,timeout=20,chunk_size=1048576,r=None,rs=0):
                     ff.write(c)
     except Exception as s:
         if rs:
-            stdout.write(f'\r下载错误:{s} 正在重试\n')
-            #raise
+            #stdout.write(f'\r下载错误:{s} 正在重试\n')
+            raise
         onednld(url,path,timeout,chunk_size,r)
     print()
 def dnlds():
@@ -60,7 +60,7 @@ def jd_ui(tmp0,tmp1,tmp2,top):
             tmp1.set('已下载:'+str(f))
             if f1:tmp2.set('进度:'+str(int(f/f1*100))+'%')
             else:break
-        except:pass
+        except:break
         sleep(0.001)
     top.destroy()
 def xcdnld(urls,paths,thread,tk=None,wt='下载中'):
@@ -74,7 +74,8 @@ def xcdnld(urls,paths,thread,tk=None,wt='下载中'):
     us=list(zip(urls,paths))
     f1=len(us)
     if f1<thread:thread=f1
-    thr=thread
+    thr=0
+    thr+=thread
     for i in range(thread):
         try:thd.Thread(target=dnlds).start()
         except:

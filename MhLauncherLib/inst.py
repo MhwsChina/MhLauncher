@@ -53,12 +53,14 @@ def readass(aid,d='.minecraft'):
     with open(pj(d,'assets/indexes/'+aid+'.json'),'r') as f:
         return loads(f.read())
 def getjsonurl(vdc,ver,d='.minecraft'):
+    if not vdc:return 0,0
     verurl=ov(vdc,ver,find=True)
     if verurl==[]:return False,pj(d,'versions/'+ver+'/'+ver+'.json')
     verurl=verurl['url']
     #if bm:verurl=verurl.replace('piston-meta.mojang.com','bmclapi2.bangbang93.com')
     return verurl,pj(d,'versions/'+ver+'/'+ver+'.json')
 def getassurl(vdc,d='.minecraft'):
+    if not vdc:return 0,0
     if 'assetIndex' in vdc:
         return vdc["assetIndex"]["url"],pj(d,'assets/indexes/'+vdc["assetIndex"]["id"]+'.json')
     else:return False,False
