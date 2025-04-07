@@ -133,7 +133,7 @@ def getjvm(v,ver,classpath,opt,d,gmdir):
     return args
 def getgame(v,ver,classpath,opt,d,gmdir):
     args=[]
-    if 'inheritsFrom' in v:
+    if 'inheritsFrom' in v and not 'minecraftArguments' in v:
         args=args+getgame(readv(v['inheritsFrom'],d),v['inheritsFrom'],classpath,opt,d,gmdir)
     if 'arguments' in v:
         if 'game' in v['arguments']:
