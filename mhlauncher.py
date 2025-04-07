@@ -24,7 +24,7 @@ def init():
     return dic
 def fdic(dic={}):
     ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl','zd']
-    ck=[0,256,1,0,2048,0,0,0,10]
+    ck=[0,256,1,0,2048,0,0,0,0]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -38,10 +38,12 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.31'
+version='v0.0.32'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.32
+修复了很多bug
 v0.0.31
 修复了一些bug
 v0.0.30
@@ -342,11 +344,16 @@ class main_ui:
         print('下载',ver)
         downloadmc(ver,vdc,self.dlth.get(),self.bm.get(),tk)
         self.listver()
+        joindl()
+        mess.showinfo('提示',f'{ver}下载完毕')
     def sxdlls(self):
         self.dlls.delete(0,'end')
         for i in ov(vdc,typ=self.dltype.get()):
             self.dlls.insert('end',i['id'])
     def searchmod(self):
+        self.tmpa=0
+        self.buttona.set('选择')
+        self.labela['text']='模组列表'
         dc={'关联':'relevance','下载量':'downloads','(作者)关注数量':'follows','发布日期':'newest','更新日期':'updated'}
         px=dc[self.pxff.get()]
         ssnum=self.ssnum.get()
@@ -372,7 +379,6 @@ class main_ui:
             if not self.mods.curselection():
                 mess.showinfo('提示','没有选择mc版本');return
             self.tmpa=2
-            self.buttona.set('下载')
             self.labela['text']='mod加载器'
             self.tmpc=self.mods.get(self.mods.curselection()[0]) 
             self.mods.delete(0,'end')
@@ -383,13 +389,21 @@ class main_ui:
             if not self.mods.curselection():
                 mess.showinfo('提示','没有选择mod加载器');return
             loader=self.mods.get(self.mods.curselection()[0])
-            p=filedialog.askdirectory()
-            mu=modurl(self.tmpb,self.tmpc,loader)
-            for file in mu[0]:
-                dnld(file[0],pj(p,file[1]))
-            self.tmpa=0
-            self.buttona.set('选择')
-            self.labela['text']='模组列表'
+            self.dlp=filedialog.askdirectory()
+            self.mu=modurl(self.tmpb,self.tmpc,loader)
+            self.mods.delete(0,'end')
+            for file in self.mu[0]:
+                self.mods.insert(0,file[1])
+            self.tmpa=3
+            self.buttona.set('下载')
+            self.labela['text']='文件列表'
+            return
+        if self.tmpa==3:
+            if not self.mods.curselection():
+                mess.showinfo('提示','没有选择文件');return
+            nm=self.mods.get(self.mods.curselection()[0])
+            url=self.mu[0][self.mods.curselection()[0]][0]
+            dnld(url,pj(self.dlp,nm))
             th.Thread(target=self.searchmod).start()
             mess.showinfo('安装模组','下载完成!')
             return
