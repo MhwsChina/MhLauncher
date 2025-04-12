@@ -1,11 +1,13 @@
-import tkinter as tk
-import tkinter.ttk as ttk
-import tkinter.messagebox as mess
-from tkinter import filedialog
-from MhLauncherLib import *
-import webbrowser as webb
-import threading as th
-import os,sys
+import tkinter as tk #UI界面
+import tkinter.ttk as ttk#UI界面
+import tkinter.messagebox as mess#UI界面
+from tkinter import filedialog#UI界面
+from MhLauncherLib import *#MhLauncher
+import webbrowser as webb#打开浏览器
+import threading as th#多线程
+import os,sys,psutil,shutil#文件,进程等
+import subprocess as sub#运行命令
+from time import sleep#停顿(休息),在特定功能中阻止未响应
 def getuuid(username):
     if exists('.minecraft/usercache.json'):
         with open('.minecraft/usercache.json') as f:
@@ -23,8 +25,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl','zd']
-    ck=[0,256,1,0,2048,0,0,0,0]
+    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl']
+    ck=[0,256,1,0,2048,0,0,0]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -38,10 +40,22 @@ def fdic(dic={}):
 def upopt(opt):
     with open('mhl/options.json','w') as f:
         f.write(dumps(opt))
-version='v0.0.32'
+def walk(root,path=''):
+    paths=[]
+    try:ls=os.listdir(pj(root,path))
+    except:return []
+    for i in ls:
+        if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
+        paths.append((root,path,i))
+    return paths
+version='v0.0.33'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.33
+修复了一些bug,优化UI
+新增工具箱功能
+取消窗口移动(万不得已,不然滚动条没法用)
 v0.0.32
 修复了很多bug
 v0.0.31
@@ -87,6 +101,7 @@ class main_ui:
         self.tmpa,self.tmpb,self.tmpc=0,0,0
         self.w=tk.Tk()
         self.createui()
+        self.tmpp0=1
     def mousep(self,event):
         self.X=event.x
         self.Y=event.y
@@ -100,15 +115,19 @@ class main_ui:
         ny=self.w.winfo_y()+dy
         self.w.geometry(f'+{nx}+{ny}')
     def exit(self):
+        bk=mess.askyesno('退出程序','确认关闭吗?')
+        if bk==False:return
         os._exit(0)
     def iconify(self):
-        self.w.overrideredirect(False)
-        self.w.iconify()
-        self.w.overrideredirect(True)
+        self.w.state('withdrawn')
+        if self.tmpp0:
+            mess.showinfo('MhLauncher','已最小化,单击屏幕左上角按钮恢复窗口')
+            self.tmpp0-=1
     def zhiding(self):
         while 1:
             if self.zd.get():self.w.attributes('-topmost',1)
             else:self.w.attributes('-topmost',0)
+            self.w1.attributes('-topmost','true')
             sleep(0.05)
     def createui(self):
         self.w.title('MhLauncher')
@@ -117,31 +136,44 @@ class main_ui:
         x=int((self.w.winfo_screenwidth()-self.w.winfo_reqwidth())/2)
         y=int((self.w.winfo_screenheight()-self.w.winfo_reqheight())/2)
         self.w.geometry(f'+{x}+{y}')
-        self.w.bind('<ButtonPress-1>',self.mousep)
-        self.w.bind('<ButtonRelease-1>',self.mouser)
-        self.w.bind("<B1-Motion>",self.mousem)
+        self.w1=tk.Toplevel(self.w)
+        self.w1.resizable(0, 0)
+        self.w1.overrideredirect(True)
+        self.w1.geometry(f'+0+0')
+        tk.Button(self.w1,text='MhLauncher',bd=0,command=lambda: self.w.state('normal')).pack()
+        #self.w.bind('<ButtonPress-1>',self.mousep)
+        #self.w.bind('<ButtonRelease-1>',self.mouser)
+        #self.w.bind("<B1-Motion>",self.mousem)
+        title=tk.Frame(self.w)
+        tk.Label(title,text=f'MhLauncher {version}').pack()
+        title.grid(row=0,column=0,sticky='w',pady=5,padx=5)
         closew=tk.Frame(self.w)
-        #tk.Button(closew,text='-',bd=0,command=self.iconify).grid(row=0,column=0,padx=10)
+        tk.Button(closew,text='-',bd=0,command=self.iconify).grid(row=0,column=0,padx=10)
         tk.Button(closew,text='x',bd=0,command=self.exit).grid(row=0,column=1,padx=10)
-        closew.grid(row=0,column=0,sticky='ne')
+        closew.grid(row=0,column=0,sticky='e')
         self.nt0=ttk.Notebook(self.w)
         self.gm=tk.Frame()
         self.nt0.add(self.gm,text='启动')
         self.dl=tk.Frame()
         self.nt0.add(self.dl,text='下载')
-        self.sett=tk.Frame()
-        self.nt0.add(self.sett,text='设置')
-        self.gy=tk.Frame()
-        self.nt0.add(self.gy,text='关于')
-        self.fb=tk.Frame()
-        self.nt0.add(self.fb,text='安装fabric/forge')
         self.modd=tk.Frame()
         self.nt0.add(self.modd,text='下载mod')
+        self.fb=tk.Frame()
+        self.nt0.add(self.fb,text='安装fabric/forge')
+        self.sett=tk.Frame()
+        self.nt0.add(self.sett,text='设置')
+        self.gjbox=tk.Frame()
+        self.nt0.add(self.gjbox,text='工具箱')
+        self.gy=tk.Frame()
+        self.nt0.add(self.gy,text='关于')
         #启动界面
         frml=tk.Frame(self.gm)
         tk.Label(frml,text='版本列表').pack()
-        self.vers=tk.Listbox(frml,width=50,height=10)
-        self.vers.pack()
+        vs0=tk.Scrollbar(frml,orient='vertical')
+        vs0.pack(side='right',fill='y')
+        self.vers=tk.Listbox(frml,width=50,height=10,yscrollcommand=vs0.set)
+        self.vers.pack(side='left')
+        vs0.config(command=self.vers.yview)
         frml.pack(side='left',anchor='w',padx=10,pady=5)
         frmne=tk.Frame(self.gm)
         tk.Label(frmne,text='游戏名').pack(side='top',anchor='center',padx=2,pady=5)
@@ -159,8 +191,11 @@ class main_ui:
         #下载界面
         frml1=tk.Frame(self.dl)
         tk.Label(frml1,text='版本列表').pack()
-        self.dlls=tk.Listbox(frml1,width=50,height=10)
-        self.dlls.pack()
+        vs1=tk.Scrollbar(frml1,orient='vertical')
+        vs1.pack(side='right',fill='y')
+        self.dlls=tk.Listbox(frml1,width=50,height=10,yscrollcommand=vs1.set)
+        self.dlls.pack(side='left')
+        vs1.config(command=self.dlls.yview)
         frml1.pack(side='left',anchor='w',padx=10,pady=5)
         frm2=tk.Frame(self.dl)
         self.dltype=tk.StringVar()
@@ -228,8 +263,11 @@ class main_ui:
         #fabric界面
         frm10=tk.Frame(self.fb)
         tk.Label(frm10,text='版本列表').pack()
-        self.vers1=tk.Listbox(frm10,width=50,height=10)
-        self.vers1.pack()
+        vs2=tk.Scrollbar(frm10,orient='vertical')
+        vs2.pack(side='right',fill='y')
+        self.vers1=tk.Listbox(frm10,width=50,height=10,yscrollcommand=vs2.set)
+        self.vers1.pack(side='left')
+        vs2.config(command=self.vers1.yview)
         frm10.grid(column=0,row=0,padx=10,pady=5,rowspan=2)
         tk.Button(self.fb,text='安装',command=lambda: th.Thread(target=self.fabric).start()).grid(column=1,row=0,padx=10,pady=5)
         frm11=tk.Frame(self.fb)
@@ -241,8 +279,11 @@ class main_ui:
         frm12=tk.Frame(self.modd)
         self.labela=tk.Label(frm12,text='模组列表')
         self.labela.pack()
-        self.mods=tk.Listbox(frm12,width=50,height=10)
-        self.mods.pack()
+        vs3=tk.Scrollbar(frm12,orient='vertical')
+        vs3.pack(side='right',fill='y')
+        self.mods=tk.Listbox(frm12,width=50,height=10,yscrollcommand=vs3.set)
+        self.mods.pack(side='left')
+        vs3.config(command=self.mods.yview)
         frm12.grid(row=0,column=0,padx=10,pady=5)
         self.ssnum=tk.IntVar()
         frm13=tk.Frame(self.modd)
@@ -261,6 +302,27 @@ class main_ui:
         tk.Button(frm13,text='搜索',command=self.searchmod).pack()
         tk.Button(frm13,textvariable=self.buttona,command=self.dlmod).pack()
         frm13.grid(row=0,column=1,padx=10,pady=5)
+        #工具箱
+        frm14=tk.Frame(self.gjbox)
+        #进程列表
+        tk.Label(frm14,text='进程列表').pack()
+        vs4=tk.Scrollbar(frm14,orient='vertical')
+        vs4.pack(side='right',fill='y')
+        self.tasks=tk.Listbox(frm14,width=50,height=10,yscrollcommand=vs4.set)
+        self.tasks.pack(side='left')
+        vs4.config(command=self.tasks.yview)
+        frm14.grid(row=0,column=0,padx=10,pady=5)
+        frm15=tk.Frame(self.gjbox)
+        tk.Button(frm15,text='刷新进程列表',command=self.flushtask).pack()
+        tk.Button(frm15,text='关闭所有该名字的进程',command=self.kill).pack()
+        tk.Button(frm15,text='关闭并删除',command=self.rmtask).pack()
+        tk.Button(frm15,text='删除该进程的文件夹(卸载)',command=lambda: self.rmtask(1)).pack()
+        #tk.Button(frm15,text='获取详细信息').pack()
+        tk.Label(frm15,text='命令执行(cmd不可用时)').pack()
+        self.cmdt=tk.Entry(frm15)
+        self.cmdt.pack()
+        tk.Button(frm15,text='执行',command=lambda: self.cmd(self.cmdt.get())).pack()
+        frm15.grid(row=0,column=1,padx=10,pady=5)
         #######################
         self.loadopt(opt)
         self.listver()
@@ -268,6 +330,7 @@ class main_ui:
         self.nt0.grid(row=1,column=0,padx=10,pady=5)
         th.Thread(target=self.zhiding).start()
         th.Thread(target=self.searchmod).start()
+        self.flushtask()
         #获取运行内存self.mb.get()
         #获取下载线程self.dlth.get()
         #获取是否国内源self.bm.get()
@@ -284,7 +347,6 @@ class main_ui:
         self.bqwj.set(opt['bqwj'])
         self.gl.set(opt['gl'])
         self.usbox.insert(0,opt['opt']['username'])
-        self.zd.set(opt['zd'])
     def saveopt(self):
         opt['thread']=self.dlth.get()
         opt['bm']=self.bm.get()
@@ -292,7 +354,6 @@ class main_ui:
         opt['bqwj']=self.bqwj.get()
         opt['gl']=self.gl.get()
         opt['mb']=self.mb.get()
-        opt['zd']=self.zd.get()
         upopt(opt)
     def setus(self,event):
         opt['opt']['username']=self.usbox.get()
@@ -390,22 +451,74 @@ class main_ui:
                 mess.showinfo('提示','没有选择mod加载器');return
             loader=self.mods.get(self.mods.curselection()[0])
             self.dlp=filedialog.askdirectory()
-            self.mu=modurl(self.tmpb,self.tmpc,loader)
-            self.mods.delete(0,'end')
-            for file in self.mu[0]:
-                self.mods.insert(0,file[1])
-            self.tmpa=3
-            self.buttona.set('下载')
-            self.labela['text']='文件列表'
-            return
-        if self.tmpa==3:
-            if not self.mods.curselection():
-                mess.showinfo('提示','没有选择文件');return
-            nm=self.mods.get(self.mods.curselection()[0])
-            url=self.mu[0][self.mods.curselection()[0]][0]
-            dnld(url,pj(self.dlp,nm))
+            for i in modurl(self.tmpb,self.tmpc,loader)[0]:
+                dnld(i[0],pj(self.dlp,i[1]))
             th.Thread(target=self.searchmod).start()
             mess.showinfo('安装模组','下载完成!')
             return
+    def killtask(self,pid):
+        psutil.Process(pid).terminate()
+    def getalltask(self):
+        ts=[]
+        for i in psutil.process_iter():
+            ts.append((i.pid,i.name()))
+        return ts
+    def flushtask(self):
+        self.tt=self.getalltask()
+        self.tasks.delete(0,'end')
+        for i in self.tt:
+            self.tasks.insert('end',i[1]+'    pid='+str(i[0]))
+    def cmd(self,cmd):
+        th.Thread(target=sub.run,args=(cmd,)).start()
+    def kill(self):
+        if not self.tasks.curselection():return
+        nm=self.tt[self.tasks.curselection()[0]][1]
+        tmp=0
+        p=self.getpid(nm)
+        while p:
+            for i in p:
+                try:self.killtask(i)
+                except:tmp=1
+            sleep(0.5)
+            if tmp:break
+            self.getpid(nm)
+        self.flushtask()
+    def getpid(self,name):
+        return [i.pid for i in psutil.process_iter() if i.name()==name]
+    def killp(self,name):
+        for i in self.getpid(name):
+            try:self.killtask(i)
+            except:pass
+    def rmtask(self,di=0):
+        if not self.tasks.curselection():return
+        pid=self.tt[self.tasks.curselection()[0]][0]
+        nm=self.tt[self.tasks.curselection()[0]][1]
+        d=psutil.Process(pid).exe()
+        fd=os.path.split(d)[0]
+        self.killp(nm)
+        dls=[]
+        try:os.remove(d)
+        except:dls.append((d,nm))
+        if not di:
+            while 1:
+                try:os.remove(d);return
+                except:pass
+        for i in walk(fd):
+            r,d,f=i
+            p=pj(r,d,f)
+            try:self.killp(f)
+            except:continue
+            dls.append((p,f))
+        while dls:
+            p,f=dls.pop(0)
+            self.killp(f)
+            try:
+                if os.path.exists(p):
+                    if os.path.isdir(p):
+                        shutil.rmtree(p)
+                        continue
+                    os.remove(p)
+            except:
+                dls.append((p,f))
 main=main_ui()
 main.runui()
