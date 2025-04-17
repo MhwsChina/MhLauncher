@@ -134,7 +134,7 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False,uri='https://bmclapi2.bangb
             print('开始下载版本索引')
             dnld(url,path,1000)
             print('完成')
-            us.append(clienturl);ps.append(clientpath)
+            us.append(clienturl);ps.append(clientpath);sha1s.append(False)
     try:vdc=readv(ver)
     except:
         print('开始下载版本索引')
@@ -165,15 +165,15 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False,uri='https://bmclapi2.bangb
         ps=ps+ps1
         sha1s=sha1s+sh
     if bq:return us,ps,uu,pp,sha1s
-    return us,ps
-def downloadmc_noui(ver,vdc,thread=128,dlout=0,bm=False,d='.minecraft'):
+    return us,ps,sha1s
+'''def downloadmc_noui(ver,vdc,thread=128,dlout=0,bm=False,d='.minecraft'):
     print('开始下载',ver)
     urls,paths=gtmcurl(ver,vdc,d,bm)
     print('开始下载资源文件')
     xcdnld(urls,paths,thread,dlout)
     #asyncio.run(asyncdl(urls,paths,300))
     print(ver,'下载完成')
-    pause()
+    pause()'''
 def downloadmc(ver,vdc,thread,bm=False,tk=None,d='.minecraft'):
-    urls,paths=gtmcurl(ver,vdc,d,bm)
-    xcdnld(urls,paths,thread,tk,'下载游戏')
+    urls,paths,sha1s=gtmcurl(ver,vdc,d,bm)
+    xcdnld(urls,paths,thread,sha1s,tk,'下载游戏')
