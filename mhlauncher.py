@@ -20,7 +20,8 @@ def init():
     if not exists('mhl/options.json'):dic=fdic()
     else:
         with open('mhl/options.json') as f:
-            dic=loads(f.read())
+            try:dic=loads(f.read())
+            except:dic=fdic()
     dic=fdic(dic)
     upopt(dic)
     return dic
@@ -48,10 +49,12 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version='v0.0.33'
+version='v0.0.34'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.34
+下载时不会下载重复文件
 v0.0.33
 修复了一些bug,优化UI
 新增工具箱功能
