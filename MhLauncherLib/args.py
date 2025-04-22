@@ -36,14 +36,18 @@ def parsel(rules):
         if not parseo(i):
             return False
     return True
+def getfg():
+    if platform.system()=='Windows':
+        return ';'
+    else:return ':'
 def getcp(ver,d='.minecraft',cl=True):
-    if platform.system()=='Windows':fg=';'
-    else:fg=':'
+    fg=getfg()
     v=readv(ver,d)
     classpath=''
     if 'inheritsFrom' in v:
         classpath+=getcp(v['inheritsFrom'],d,False)
-        ver=v['inheritsFrom']
+        veri=v['inheritsFrom']
+    else:veri=ver
     for c in v['libraries']:
         p=False
         if 'rules' in c and not parsel(c['rules']):continue
@@ -60,9 +64,13 @@ def getcp(ver,d='.minecraft',cl=True):
             path=pj(d,f'libraries/{f}')
         else:continue
         classpath+=path+fg
-    if cl:classpath+=pj(d,'versions',ver,ver+'.jar')
+    if cl:
+        if v['mainClass']=='cpw.mods.bootstraplauncher.BootstrapLauncher':
+            classpath+=pj(d,'versions',ver,ver+'.jar')
+        else:
+            classpath+=pj(d,'versions',veri,veri+'.jar')
     return classpath
-def fmarg(txt,ver,classpath,v,opt,gmdir,d='.minecraft'):
+def fmarg(txt,ver,classpath,v,opt,gmdir,d='.minecraft',fg=getfg()):
     if 'assets' in v:
         txt=txt.replace('${natives_directory}',pj(d,f'versions/{ver}/{ver}-natives'))\
              .replace('${launcher_name}','MhLauncher')\
@@ -82,7 +90,8 @@ def fmarg(txt,ver,classpath,v,opt,gmdir,d='.minecraft'):
              .replace('${resolution_height}','480')\
              .replace('${game_assets}',pj(d,"assets/virtual/legacy"))\
              .replace('${auth_session}',opt['token'])\
-             .replace('${library_directory}',pj(d,'libraries'))     
+             .replace('${library_directory}',pj(d,'libraries'))\
+             .replace('${classpath_separator}',fg)
              #.replace('${quickPlayPath}',opt['quickplaypath'])\
              #.replace('${quickPlaySingleplayer}',opt['quickplaysingleplayer'])\
              #.replace('${quickPlayMultiplayer}',opt['quickplaymultiplayer'])\
@@ -104,17 +113,19 @@ def fmarg(txt,ver,classpath,v,opt,gmdir,d='.minecraft'):
              .replace('${resolution_height}','480')\
              .replace('${game_assets}',pj(d,"assets/virtual/legacy"))\
              .replace('${auth_session}',opt['token'])\
-             .replace('${library_directory}',pj(d,'libraries'))
+             .replace('${library_directory}',pj(d,'libraries'))\
+             .replace('${classpath_separator}',fg)
     return txt
 def getjvm(v,ver,classpath,opt,d,gmdir):
+    fg=getfg()
     args=[]
     if 'inheritsFrom' in v:
         args=args+getjvm(readv(v['inheritsFrom'],d),v['inheritsFrom'],classpath,opt,d,gmdir)
-    elif 'arguments' in v:
+    if 'arguments' in v:
         if 'jvm' in v['arguments']:
             for i in v['arguments']['jvm']:
                 if type(i)==str:
-                    args.append(fmarg(i,ver,classpath,v,opt,gmdir,d))
+                    args.append(fmarg(i,ver,classpath,v,opt,gmdir,d,fg))
                 else:
                     if 'rules' in i and not parsel(i['rules']):continue
                     value=i['value']
@@ -123,15 +134,16 @@ def getjvm(v,ver,classpath,opt,d,gmdir):
                             args.append(ii)
                     else:
                         args.append(value)
-    elif 'jvmArguments' in v:
+    if 'jvmArguments' in v:
         args=args+v['jvmArguments']
-    else:
+    if not 'jvmArguments' in v and not 'arguments' in v:
         args.append('-Djava.library.path='+pj(d,f'versions/{ver}/{ver}-natives'))
     if 'minecraftArguments' in v:
         args.append('-cp')
         args.append(classpath)
     return args
 def getgame(v,ver,classpath,opt,d,gmdir):
+    fg=getfg()
     args=[]
     if 'inheritsFrom' in v and not 'minecraftArguments' in v:
         args=args+getgame(readv(v['inheritsFrom'],d),v['inheritsFrom'],classpath,opt,d,gmdir)
@@ -139,13 +151,21 @@ def getgame(v,ver,classpath,opt,d,gmdir):
         if 'game' in v['arguments']:
             for i in v['arguments']['game']:
                if type(i)==str:
-                   args.append(fmarg(i,ver,classpath,v,opt,gmdir,d))
+                   args.append(fmarg(i,ver,classpath,v,opt,gmdir,d,fg))
     if 'minecraftArguments' in v:
-        args=args+fmarg(v['minecraftArguments'],ver,classpath,v,opt,gmdir,d).split()
+        args=args+fmarg(v['minecraftArguments'],ver,classpath,v,opt,gmdir,d,fg).split()
     return args
 def getmcargs(ver,java,opt,marg=[],d='.minecraft',gl=False):
     v=readv(ver,d)
-    args=[java,'-XX:+UseG1GC','-XX:-UseAdaptiveSizePolicy','-XX:-OmitStackTraceInFastThrow']
+    args=[java,
+          '-XX:+UseG1GC',
+          '-XX:-UseAdaptiveSizePolicy',
+          '-XX:-OmitStackTraceInFastThrow',
+          '-Djdk.lang.Process.allowAmbiguousCommands=true',
+          '-Dfml.ignoreInvalidMinecraftCertificates=True',
+          '-Dfml.ignorePatchDiscrepancies=True',
+          '-Dlog4j2.formatMsgNoLookups=true'
+          ]
     if marg:args=args+marg
     classpath=getcp(ver,d=d)
     if gl:gmdir=pj(d,'versions',ver)
