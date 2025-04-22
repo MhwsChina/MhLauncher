@@ -49,10 +49,12 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version='v0.0.34'
+version='v0.0.35'
 s3='''
 =======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.35
+修复了不能启动1.20版本forge的bug
 v0.0.34
 下载时不会下载重复文件
 v0.0.33
