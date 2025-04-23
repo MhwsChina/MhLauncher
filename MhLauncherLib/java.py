@@ -28,17 +28,19 @@ def downjava(name,path='',dlthread=128):
     tmp=ls[getxt()][name][0]
     url=tmp['manifest']['url']
     js=loads(rq.get(url,timeout=999999).text)
-    u,p=[],[]
+    u,p,s=[],[],[]
     path=pj(path,tmp['version']['name'])
     for i in js['files']:
         j=js['files'][i]
         if j['type']=='directory':
-            if not os.path.exists(i):
-                os.makedirs(pj(path,i))
+            if not os.path.exists(pj(path,i)):
+                try:os.makedirs(pj(path,i))
+                except:pass
         else:
             if 'downloads' in j:
                 if 'raw' in j['downloads']:
                     u.append(j['downloads']['raw']['url'])
                     p.append(pj(path,i))
-    xcdnld(u,p,dlthread,tk,'安装java')
+                    s.append(j['downloads']['raw']['sha1'])
+    xcdnld(u,p,dlthread,s,tk,'安装java')
     joindl()

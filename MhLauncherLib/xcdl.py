@@ -77,21 +77,26 @@ def jd_tqdm(f1,thread):
     for i in tqdm(range(f1),desc='进度',unit='文件'):
         if th>=thread:break
         while i>=f:sleep(0.1)
-def jd_ui(tmp0,tmp1,tmp2,top):
+def jd_ui(tmp0,tmp1,tmp2,tim,top):
     global thr
-    while th<=thr:
+    s,m,h=0,0,0
+    while th<thr:
+        if s>59:s,m=0,m+1
+        if m>59:m,h=0,h+1
         try:
             tmp0.set('总文件:'+str(f1))
             tmp1.set('已下载:'+str(f))
             if f1:tmp2.set('进度:'+str(int(f/f1*100))+'%')
             else:break
+            tim.set(f'用时:{h}时{m}分{s}秒')
         except:break
-        sleep(0.001)
+        s+=1
+        sleep(1)
     top.destroy()
 def xcdnld(urls,paths,thread,sha=[],tk=None,wt='下载中'):
     global us,f,th,f1,thr
     if us:thread=th
-    else:th=0
+    else:th,f=0,0
     if thread>len(urls):thread=len(urls)
     if not sha:sha=len(urls)*[0]
     #sha=[{'type':'sha1','hash':hash}]
@@ -109,10 +114,12 @@ def xcdnld(urls,paths,thread,sha=[],tk=None,wt='下载中'):
         top.title(wt)
         top.geometry('200x100')
         tmp0,tmp1,tmp2=tk.StringVar(),tk.StringVar(),tk.StringVar()
+        tim=tk.StringVar()
         tk.Label(top,textvariable=tmp0).pack()
         tk.Label(top,textvariable=tmp1).pack()
         tk.Label(top,textvariable=tmp2).pack()
-        thd.Thread(target=jd_ui,args=(tmp0,tmp1,tmp2,top)).start()
+        tk.Label(top,textvariable=tim).pack()
+        thd.Thread(target=jd_ui,args=(tmp0,tmp1,tmp2,tim,top)).start()
 def joindl():
     global thr,th
     while th<thr:

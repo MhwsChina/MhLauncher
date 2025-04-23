@@ -3,7 +3,7 @@ from .xcdl import *
 from .inst import *
 import subprocess as sub
 import os,zipfile,platform,tempfile
-from json import loads
+from json import loads,dumps
 import requests as req
 from random import randint
 def rdt():
@@ -43,17 +43,17 @@ def fabric(ver,java,p='.minecraft',d='.minecraft'):
     sub.call(cmd)
     os.remove(path)
 def get_library_path(name, path):
-    libpath = os.path.join(path, "libraries")
+    libpath = pj(path, "libraries")
     parts = name.split(":")
     base_path, libname, version = parts[0:3]
     for i in base_path.split("."):
-        libpath = os.path.join(libpath, i)
+        libpath = pj(libpath, i)
     try:
         version, fileend = version.split("@")
     except ValueError:
         fileend = "jar"
     filename = f"{libname}-{version}{''.join(map(lambda p: f'-{p}', parts[3:]))}.{fileend}"
-    libpath = os.path.join(libpath, libname, version, filename)
+    libpath = pj(libpath, libname, version, filename)
     return libpath
 def empty(arg):
     pass
@@ -132,14 +132,24 @@ def forge(v,java,p='.minecraft',d='.minecraft'):
     with zf.open("install_profile.json","r") as f:
         c=f.read()
     data=loads(c)
-    ff=data['version']
-    extract(zf,'version.json',pj(d,'versions',ff,f'{ff}.json'))
+    ff=data['version'] if 'version' in data else data['install']['version']
+    jsp=pj(d,'versions',ff,f'{ff}.json')
+    try:extract(zf,'version.json',jsp)
+    except KeyError:
+        if 'versionInfo' in data:
+            lib=data['versionInfo']
+            with open(jsp,'w') as f:
+                f.write(dumps(lib))
     lmza_path=pj(p,f'client{rdt()}.lzma')
     try:extract(zf,'data/client.lzma',lmza_path)
     except:pass
-    us,ps=libraries(data,0,0)
-    xcdnld(us,ps,256)
-    forge_processors(data,d,lmza_path,path,java,{})
+    if 'libraries' in data:
+        lib=data
+    us,ps,ss=libraries(lib,0,1)
+    xcdnld(us,ps,256,ss)
+    if 'processors' in data:
+        forge_processors(data,d,lmza_path,path,java,{})
     zf.close()
     os.remove(path)
-    os.remove(lmza_path)
+    try:os.remove(lmza_path)
+    except:pass

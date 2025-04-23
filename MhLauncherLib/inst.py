@@ -64,22 +64,27 @@ def getassurl(vdc,d='.minecraft'):
     if 'assetIndex' in vdc:
         return vdc["assetIndex"]["url"],pj(d,'assets/indexes/'+vdc["assetIndex"]["id"]+'.json')
     else:return False,False
+def get_library_path(name, path):
+    libpath = pj(path, "libraries")
+    parts = name.split(":")
+    base_path, libname, version = parts[0:3]
+    for i in base_path.split("."):
+        libpath = pj(libpath, i)
+    try:
+        version, fileend = version.split("@")
+    except ValueError:
+        fileend = "jar"
+    filename = f"{libname}-{version}{''.join(map(lambda p: f'-{p}', parts[3:]))}.{fileend}"
+    libpath = pj(libpath, libname, version, filename)
+    return libpath
 def libraries(vdc,bm=False,bq=False,d='.minecraft',uri='https://bmclapi2.bangbang93.com'):
     us,ps,sha1s=[],[],[]
     for lib in vdc['libraries']:
         if 'downloads' not in lib:
-            tags=lib['name'].split(':')
-            if len(tags)==3:
-                p,n,vs=tags
-                p=p.replace('.','/')
-                f=f'{p}/{n}/{vs}/{n}-{vs}.jar'
-                path=pj(d,f'libraries/{f}')
-            elif len(tags)==4:
-                p,n,vs,xt=tags
-                p=p.replace('.','/')
-                f=f'{p}/{n}/{vs}/{n}-{vs}-{xt}.jar'
-                path=pj(d,f'libraries/{f}')
+            if 'url' not in lib:continue
+            f=get_library_path(lib['name'],'')
             url=lib['url']+f
+            path=pj(d,f)
             us.append(url);ps.append(path)
             if bq:
                 if 'sha1' in lib:sha1s.append(lib['sha1'])
