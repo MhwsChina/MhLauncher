@@ -85,13 +85,13 @@ def bqwj(ver,vdc,di,thread,sha=0):
         u,p,s=us[i],ps[i],sha1[i]
         if not exists(p):uss.append(u);pss.append(p)
         if sha:
-            if s=='SHABI':continue
+            if not s:continue
             if ghash(p)!=s:uss.append(u);pss.append(p)
     for i in range(len(uu)):
         u,p=uu[i],pp[i]
         if not exists(p):uss.append(u);pss.append(p)
     if not uss==[]:
-        xcdnld(uss,pss,thread,tk,'补全文件')
+        xcdnld(uss,pss,thread,[],tk,'补全文件')
         joindl()
     for l in d['libraries']:
         if 'downloads' not in l:continue

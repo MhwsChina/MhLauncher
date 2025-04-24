@@ -88,7 +88,7 @@ def libraries(vdc,bm=False,bq=False,d='.minecraft',uri='https://bmclapi2.bangban
             us.append(url);ps.append(path)
             if bq:
                 if 'sha1' in lib:sha1s.append(lib['sha1'])
-                else:sha1s.append('SHABI')
+                else:sha1s.append(False)
             continue
         if "artifact" in lib["downloads"] and not "classifiers" in lib["downloads"]:
             if lib["downloads"]["artifact"]["url"]=='':continue
