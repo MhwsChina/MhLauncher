@@ -35,14 +35,9 @@ def verdict(sv='.minecraft'):
     if not exists(sv):os.mkdir(sv)
     try:v=getverdict()
     except:
-        if os.path.exists(pj(sv,'version.json')):
-            with open(pj(sv,'version.json'),'r') as f:
-                return loads(f.read())
-        else:
-            print('无法获取mc版本列表,无法进行下载游戏操作!')
-            return {}
-    with open(pj(sv,'version.json'),'w') as f:
-        f.write(dumps(v))
+        print('无法获取mc版本列表,无法进行下载游戏操作!')
+        return {}
+    if 'versions' not in v:return {}
     return v
 def setmem():
     s=input('1.自定义/2.自动分配',['1','2'])
