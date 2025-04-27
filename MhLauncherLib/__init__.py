@@ -6,7 +6,6 @@ from .args import *
 from .java import *
 from .fabric import *
 from .mod import *
-version='v0.0.39'
 rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
 v0.0.39
@@ -57,4 +56,4 @@ v0.0.23
 修复了一些bug
 '''[1:-1]
 def getrizhi():
-    return version,rizhi
+    return rizhi
