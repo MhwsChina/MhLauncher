@@ -6,9 +6,11 @@ from .args import *
 from .java import *
 from .fabric import *
 from .mod import *
-version='v0.0.38'
+version='v0.0.39'
 rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.39
+自动更新变快
 v0.0.38
 第一次启动不需要网络了
 (不用加载版本列表)

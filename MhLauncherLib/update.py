@@ -21,7 +21,9 @@ def check_update(now_version,save_path='',oot=0,write_path=sys.argv[0],api_url='
     if n[0]>n1[0] or n[1]>n1[1] or n[2]>n1[2]:
         ur=['https://github.moeyy.xyz/','https://ghf.xn--eqrr82bzpe.top/']
         for i in ur:
-            try:dnld(i+dlurl.replace('%tagver%',latest['name']),p)
+            try:
+                dnld(i+dlurl.replace('%tagver%',latest['name']),p)
+                break
             except:pass
         shutil.move(sys.argv[0],pj(save_path,'OLD_LAUNCHER'))
         f=open(p,'rb')
