@@ -49,7 +49,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.39',getrizhi()
+version,s3='v0.0.40',getrizhi()
 print('正在加载配置文件...')
 opt=init()
 print('完成!')
@@ -341,7 +341,7 @@ class main_ui:
         if not self.vers1.curselection():
             mess.showinfo('提示','没有选择版本');return            
         ver=self.vers1.get(self.vers1.curselection()[0])
-        java='java-runtime-gamma-snapshot'
+        java='java-runtime-gamma'
         try:javaw=fjava(ls=['mhl/java'],t=1)['17']
         except:
             downjava(java,'./mhl/java',self.dlth.get())
@@ -417,6 +417,7 @@ class main_ui:
                 mess.showinfo('提示','没有选择mod加载器');return
             loader=self.mods.get(self.mods.curselection()[0])
             self.dlp=filedialog.askdirectory()
+            if not self.dlp:return
             for i in modurl(self.tmpb,self.tmpc,loader)[0]:
                 dnld(i[0],pj(self.dlp,i[1]))
             th.Thread(target=self.searchmod).start()
