@@ -173,8 +173,12 @@ def mcjava(v,vd,d='.minecraft',m=True):
         if mvv[0]>=dc['16'] and mvv[0]<dc['17']:return '16'
         if mvv[0]>=dc['17'] and mvv[0]<dc['21']:return '17'
         if mvv[0]>=dc['21']:return '21'"""
-    if m:return str(dc['javaVersion']['majorVersion'])
-    else:return str(dc['javaVersion']['component'])
+    if 'javaVersion' in dc:
+        if m:return str(dc['javaVersion']['majorVersion'])
+        else:return str(dc['javaVersion']['component'])
+    else:
+        if m:return '17'
+        else:return 'java-runtime-gamma'
 def removemc(ver,d='.minecraft'):
     p=pj(d,'versions/'+ver)
     if exists(p):

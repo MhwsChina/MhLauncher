@@ -119,6 +119,7 @@ def fmarg(txt,ver,classpath,v,opt,gmdir,d='.minecraft',fg=getfg()):
 def getjvm(v,ver,classpath,opt,d,gmdir):
     fg=getfg()
     args=[]
+    yh='-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
     if 'inheritsFrom' in v:
         args=args+getjvm(readv(v['inheritsFrom'],d),v['inheritsFrom'],classpath,opt,d,gmdir)
     if 'arguments' in v:
@@ -139,6 +140,8 @@ def getjvm(v,ver,classpath,opt,d,gmdir):
     if not 'jvmArguments' in v and not 'arguments' in v:
         args.append('-Djava.library.path='+pj(d,f'versions/{ver}/{ver}-natives'))
     if 'minecraftArguments' in v:
+        if platform.system()=='Windows' and not yh in args:
+            args.append(yh)
         args.append('-cp')
         args.append(classpath)
     return args
@@ -152,6 +155,7 @@ def getgame(v,ver,classpath,opt,d,gmdir):
             for i in v['arguments']['game']:
                if type(i)==str:
                    args.append(fmarg(i,ver,classpath,v,opt,gmdir,d,fg))
+        
     if 'minecraftArguments' in v:
         args=args+fmarg(v['minecraftArguments'],ver,classpath,v,opt,gmdir,d,fg).split()
     return args
