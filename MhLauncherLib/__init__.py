@@ -10,7 +10,6 @@ rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
 v0.0.41
 一些小修改
-UI自定义
 v0.0.40
 修复了部分版本无法识别java的bug
 其他一些小修改
