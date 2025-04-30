@@ -130,11 +130,7 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False,uri='https://bmclapi2.bangb
     sha1s=[]
     url,path=getjsonurl(vdc,ver,d)
     if url:
-        clienturl=f"https://bmclapi2.bangbang93.com/version/{ver}/client"
-        clientpath=pj(d,'versions/'+ver+'/'+ver+'.jar')
-        if bq:
-            uu.append(url);pp.append(path)
-            uu.append(clienturl);pp.append(clientpath)
+        if bq:uu.append(url);pp.append(path)
         else:
             print('开始下载版本索引')
             dnld(url,path,1000)
@@ -146,6 +142,12 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False,uri='https://bmclapi2.bangb
         dnld(url,path,1000)
         print('完成')
         vdc=readv(ver)
+    if bm:clienturl=f"https://bmclapi2.bangbang93.com/version/{ver}/client"
+    else:clienturl=vdc['downloads']['client']['url']
+    clientpath=pj(d,'versions/'+ver+'/'+ver+'.jar')
+    if bq:
+        us.append(clienturl);ps.append(clientpath)
+        sha1s.append(vdc['downloads']['client']['sha1'])
     us1,ps1,sh=libraries(vdc,bm,1,d,uri)
     us=us+us1
     ps=ps+ps1
