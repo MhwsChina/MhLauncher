@@ -141,11 +141,12 @@ def gtmcurl(ver,vdc,d='.minecraft',bm=False,bq=False,uri='https://bmclapi2.bangb
         dnld(url,path,1000)
         print('完成')
         vdc=readv(ver)
-    if bm:clienturl=f"https://bmclapi2.bangbang93.com/version/{ver}/client"
-    else:clienturl=vdc['downloads']['client']['url']
-    clientpath=pj(d,'versions/'+ver+'/'+ver+'.jar')
-    us.append(clienturl);ps.append(clientpath)
-    sha1s.append(vdc['downloads']['client']['sha1'])
+    if 'downloads' in vdc:
+        if bm:clienturl=f"https://bmclapi2.bangbang93.com/version/{ver}/client"
+        else:clienturl=vdc['downloads']['client']['url']
+        clientpath=pj(d,'versions/'+ver+'/'+ver+'.jar')
+        us.append(clienturl);ps.append(clientpath)
+        sha1s.append(vdc['downloads']['client']['sha1'])
     us1,ps1,sh=libraries(vdc,bm,1,d,uri)
     us=us+us1
     ps=ps+ps1
