@@ -132,21 +132,19 @@ def forge(v,java,p='.minecraft',d='.minecraft'):
     with zf.open("install_profile.json","r") as f:
         c=f.read()
     data=loads(c)
-    ff=data['version'] if 'version' in data else data['install']['version']
+    ff=data['version'] if 'version' in data else data['versionInfo']['id']
     jsp=pj(d,'versions',ff,f'{ff}.json')
     try:extract(zf,'version.json',jsp)
     except KeyError:
         if 'versionInfo' in data:
-            lib=data['versionInfo']
             with open(jsp,'w') as f:
-                f.write(dumps(lib))
+                f.write(dumps(data['versionInfo'],indent=4))
     lmza_path=pj(p,f'client{rdt()}.lzma')
     try:extract(zf,'data/client.lzma',lmza_path)
     except:pass
-    if 'libraries' in data:
-        lib=data
-    us,ps,ss=libraries(lib,0,1)
-    xcdnld(us,ps,256,ss)
+    if 'libraries' in data:us,ps,ss=libraries(data,0,1)
+    else:us,ps,ss=libraries(data['versionInfo'],0,1)
+    xcdnld(us,ps,256,ss,join=1)
     if 'processors' in data:
         forge_processors(data,d,lmza_path,path,java,{})
     zf.close()

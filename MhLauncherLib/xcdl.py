@@ -7,6 +7,7 @@ from time import sleep
 f,f1,th,us=0,0,0,[]
 thr=0
 hashing=0
+threads=[]
 def pj(*args):
     return os.path.join(*args).replace('\\','/')
 def exists(p):
@@ -68,6 +69,7 @@ def dnlds():
                     f+=1
                     continue
         try:
+            print(u)
             dnld(u,p)
             f+=1
         except:f-=1
@@ -93,8 +95,8 @@ def jd_ui(tmp0,tmp1,tmp2,tim,top):
         s+=1
         sleep(1)
     top.destroy()
-def xcdnld(urls,paths,thread,sha=[],tk=None,wt='下载中'):
-    global us,f,th,f1,thr
+def xcdnld(urls,paths,thread,sha=[],tk=None,wt='下载中',join=False):
+    global us,f,th,f1,thr,threads
     if us:thread=th
     else:th,f=0,0
     if thread>len(urls):thread=len(urls)
@@ -105,9 +107,16 @@ def xcdnld(urls,paths,thread,sha=[],tk=None,wt='下载中'):
     for i in range(thread):
         while 1:
             try:
-                thd.Thread(target=dnlds).start()
+                t=thd.Thread(target=dnlds)
+                t.start()
+                threads.append(t)
                 break
             except:pass
+    if join:
+        for i in threads:
+            try:i.join()
+            except:pass
+        print('------download ok------',f)
     #jd_tqdm(f1,thread)
     if tk:
         top=tk.Toplevel()
@@ -115,10 +124,10 @@ def xcdnld(urls,paths,thread,sha=[],tk=None,wt='下载中'):
         top.geometry('200x100')
         tmp0,tmp1,tmp2=tk.StringVar(),tk.StringVar(),tk.StringVar()
         tim=tk.StringVar()
-        tk.Label(top,textvariable=tmp0).pack()
-        tk.Label(top,textvariable=tmp1).pack()
-        tk.Label(top,textvariable=tmp2).pack()
-        tk.Label(top,textvariable=tim).pack()
+        tk.Label(top,textvariable=tmp0,fg='#ff9300',font=('consolas',11)).pack()
+        tk.Label(top,textvariable=tmp1,fg='#ff9300',font=('consolas',11)).pack()
+        tk.Label(top,textvariable=tmp2,fg='#ff9300',font=('consolas',11)).pack()
+        tk.Label(top,textvariable=tim,fg='#ff9300',font=('consolas',11)).pack()
         thd.Thread(target=jd_ui,args=(tmp0,tmp1,tmp2,tim,top)).start()
 def joindl():
     global thr,th

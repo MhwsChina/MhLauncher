@@ -180,9 +180,13 @@ def mcjava(v,vd,d='.minecraft',m=True):
         if m:return '17'
         else:return 'java-runtime-gamma'
 def removemc(ver,d='.minecraft'):
-    p=pj(d,'versions/'+ver)
+    p=pj(d,'versions',ver,ver+'.json')
     if exists(p):
-        sht.rmtree(p)
+        os.remove(p)
+        print('删除',p)
+    p=pj(d,'versions',ver,ver+'.jar')
+    if exists(p):
+        os.remove(p)
         print('删除',p)
     print(ver,'删除完毕')   
 '''def downjava(ver,p='java',dp=''):
