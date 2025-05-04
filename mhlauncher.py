@@ -27,7 +27,7 @@ def init():
     return dic
 def fdic(dic={}):
     ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl']
-    ck=[0,256,1,0,2048,0,0,0]
+    ck=[0,256,1,0,2048,0,0,1]
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -49,7 +49,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.44',getrizhi()
+version,s3='v0.0.45',getrizhi()
 print('正在加载配置文件...')
 opt=init()
 print('完成!')
@@ -78,18 +78,21 @@ class main_ui:
         self.w=tk.Tk()
         self.createui()
         self.tmpp0=1
-    def mousep(self,event):
-        self.X=event.x
-        self.Y=event.y
-    def mouser(self,event):
-        self.X=0
-        self.Y=0
-    def mousem(self,event):
-        dx=event.x-self.X
-        dy=event.y-self.Y
-        nx=self.w.winfo_x()+dx
-        ny=self.w.winfo_y()+dy
-        self.w.geometry(f'+{nx}+{ny}')
+        self.mouse=0
+    def mousep(self):
+        if self.mouse>0:
+            self.mouse=0
+            self.m1.set('移动窗口')
+            return
+        else:self.mouse+=1
+        self.x = self.w.winfo_pointerx()-self.w.winfo_rootx()
+        self.y = self.w.winfo_pointery()-self.w.winfo_rooty()
+        self.m1.set('取消移动')
+        th.Thread(target=self.movew).start()
+    def movew(self):
+        while self.mouse:
+           self.w.geometry(f'+{self.w.winfo_pointerx()-self.x}+{self.w.winfo_pointery()-self.y}')
+           sleep(0.000000000000001)
     def exit(self):
         '''bk=mess.askyesno('退出程序','确认关闭吗?')
         if bk==False:return'''
@@ -117,13 +120,16 @@ class main_ui:
         self.w1.resizable(0, 0)
         self.w1.overrideredirect(True)
         self.w1.geometry(f'+0+0')
-        tk.Button(self.w1,text='MhLauncher',bd=0,command=lambda: self.w.state('normal')).pack()
-        self.w.bind('<ButtonPress-1>',self.mousep)
+        Button(self.w1,text='MhLauncher',bd=0,command=lambda: self.w.state('normal')).pack()
+        '''self.w.bind('<ButtonPress-1>',self.mousep)
         self.w.bind('<ButtonRelease-1>',self.mouser)
-        self.w.bind("<B1-Motion>",self.mousem)
+        self.w.bind("<B1-Motion>",self.mousem)'''
         title=tk.Frame(self.w)
         Label(title,text=f'MhLauncher {version}',si=13).pack()
         title.grid(row=0,column=0,sticky='w',pady=5,padx=5)
+        self.m1=tk.StringVar()
+        self.m1.set('移动窗口')
+        Button(self.w,textvariable=self.m1,command=self.mousep,si=10).grid(row=0,column=0,padx=5)
         closew=tk.Frame(self.w)
         Button(closew,text='-',bd=0,command=self.iconify).grid(row=0,column=0,padx=10)
         Button(closew,text='x',bd=0,command=self.exit).grid(row=0,column=1,padx=10)
