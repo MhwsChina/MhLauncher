@@ -49,14 +49,14 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.45',getrizhi()
-print('正在加载配置文件...')
+version,s3='v0.0.46',getrizhi()
+log('正在加载配置文件...')
 opt=init()
-print('完成!')
+log('完成!')
 if exists('mhl/OLD_LAUNCHER'):os.remove('mhl/OLD_LAUNCHER')
-print('正在获取版本列表...')
-vdc=verdict(sv='mhl')
-print('完成!')
+log('正在获取版本列表...')
+vdc=verdict()
+log('完成!')
 if opt['check_update']:
     print('正在检查更新')
     try:
@@ -391,6 +391,7 @@ class main_ui:
         joindl()
         mess.showinfo('提示',f'{ver}下载完毕')
     def sxdlls(self):
+        if not vdc:return
         self.dlls.delete(0,'end')
         for i in ov(vdc,typ=self.dltype.get()):
             self.dlls.insert('end',i['id'])
