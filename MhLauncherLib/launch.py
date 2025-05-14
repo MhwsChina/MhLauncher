@@ -31,13 +31,16 @@ def ghash(f,typ='sha1'):
         return hashlib.new(typ,f.read()).hexdigest()
 def exists(p):
     return os.path.exists(p)
-def verdict(sv='.minecraft'):
-    if not exists(sv):os.mkdir(sv)
+def verdict():
+    n={'latest':{},'versions':[]}
     try:v=getverdict()
     except:
         print('无法获取mc版本列表,无法进行下载游戏操作!')
         return {}
-    if 'versions' not in v:return {}
+    try:s=v['versions']
+    except:
+        print('版本列表错误,请尝试关闭vpn/加速器或检查网络')
+        return {}
     return v
 def setmem():
     s=input('1.自定义/2.自动分配',['1','2'])

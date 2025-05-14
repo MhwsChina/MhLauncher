@@ -8,6 +8,8 @@ from .fabric import *
 from .mod import *
 rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.46
+修复了启动后Failed to execute script的bug
 v0.0.45
 UI修改
 删除游戏时不会删除存档(版本隔离时)

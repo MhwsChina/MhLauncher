@@ -16,7 +16,7 @@ def print(*args,end='\n'):
 def log(*args,mode='INFO'):
     txt=' '.join([*args])
     m=inspect.currentframe().f_back.f_code.co_name
-    if m=='<module>':m=''
+    if m=='<module>':m='[MAIN]: '
     else:m=f'[{m}]: '
     t=time.strftime('%H:%M:%S',time.localtime(time.time()))
     print(f'[{t} {mode}]: {m}{txt}')

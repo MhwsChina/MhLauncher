@@ -7,13 +7,15 @@ def pj(*args):
     return os.path.join(*args).replace('\\','/')
 def gt(urls,timeout=10):
     for i in urls:
-        try:return rq.get(i,timeout=timeout).text
+        try:
+            log('GET'+' '+i)
+            return rq.get(i,timeout=timeout).text
         except:pass
 def getverdict():
     ls=["https://launchermeta.mojang.com/mc/game/version_manifest.json",
         "https://bmclapi2.bangbang93.com/mc/game/version_manifest.json"
         ]
-    return loads(gt(ls,10))
+    return loads(gt(ls,5))
 def ov(vdc,typ='release',lt=False,find=False):
     #typ=release,snapshot,old_beta,old_alpha
     vs=[]
