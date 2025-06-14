@@ -49,7 +49,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.46',getrizhi()
+version,s3='v0.0.47',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -63,15 +63,15 @@ if opt['check_update']:
         th.Thread(target=check_update,args=(version,'mhl')).start()
     except:raise;print('失败')
 def Label(b,si=11,**kw):
-    return tk.Label(b,**kw,fg='#ff9300',font=('consolas',si))
+    return tk.Label(b,**kw,highlightthickness=0,fg='#ff9300',font=('consolas',si))
 def Listbox(b,si=11,**kw):
-    return tk.Listbox(b,**kw,fg='#ff9300',font=('consolas',si))
+    return tk.Listbox(b,**kw,highlightthickness=0,fg='#ff9300',font=('consolas',si))
 def Button(b,si=11,**kw):
-    return tk.Button(b,**kw,activebackground='#fba632',relief='groove',fg='#ff9300',font=('consolas',si))
+    return tk.Button(b,**kw,highlightthickness=0,activebackground='#fba632',relief='groove',fg='#ff9300',font=('consolas',si))
 def Entry(b,si=11,**kw):
-    return tk.Entry(b,**kw,fg='#ff9300',font=('consolas',si))
+    return tk.Entry(b,**kw,highlightthickness=0,fg='#ff9300',font=('consolas',si))
 def Radiobutton(b,si=11,**kw):
-    return tk.Radiobutton(b,**kw,fg='#ff9300',font=('consolas',si),relief='flat')
+    return tk.Radiobutton(b,**kw,highlightthickness=0,fg='#ff9300',font=('consolas',si),relief='flat')
 class main_ui:
     def __init__(self):
         self.tmpa,self.tmpb,self.tmpc=0,0,0
@@ -113,13 +113,15 @@ class main_ui:
         self.w.title('MhLauncher')
         self.w.overrideredirect(True)
         self.w.resizable(0, 0)
-        x=int((self.w.winfo_screenwidth()-self.w.winfo_reqwidth())/2)
-        y=int((self.w.winfo_screenheight()-self.w.winfo_reqheight())/2)
-        self.w.geometry(f'+{x}+{y}')
         self.w1=tk.Toplevel(self.w)
         self.w1.resizable(0, 0)
         self.w1.overrideredirect(True)
         self.w1.geometry(f'+0+0')
+        '''self.image = Image.open("R-C.jpg")
+        self.photo=ImageTk.PhotoImage(self.image)
+        background=tk.Canvas(self.w)
+        background.create_image(200,100,image=self.photo)
+        background.grid(column=0,row=1)'''
         Button(self.w1,text='MhLauncher',bd=0,command=lambda: self.w.state('normal')).pack()
         '''self.w.bind('<ButtonPress-1>',self.mousep)
         self.w.bind('<ButtonRelease-1>',self.mouser)
@@ -306,6 +308,9 @@ class main_ui:
         self.cmdt.pack()
         Button(frm15,text='执行',command=lambda: self.cmd(self.cmdt.get())).pack()
         frm15.grid(row=0,column=1,padx=10,pady=5)
+        x=int((self.w.winfo_screenwidth()-self.w.winfo_reqwidth())/2)
+        y=int((self.w.winfo_screenheight()-self.w.winfo_reqheight())/2)
+        self.w.geometry(f'+{x}+{y}')
         #######################
         self.loadopt(opt)
         self.listver()
@@ -319,7 +324,7 @@ class main_ui:
         #获取是否国内源self.bm.get()
         #获取检查更新self.checkup.get()
         #是否全面补全文件self.bqwj.get()
-        #版本隔离self.gl.get()
+        #版本隔离self.gl.get()'''
     def runui(self):
         self.w.mainloop()
     def loadopt(self,opt):
@@ -424,20 +429,39 @@ class main_ui:
             if not self.mods.curselection():
                 mess.showinfo('提示','没有选择mc版本');return
             self.tmpa=2
-            self.labela['text']='mod加载器'
-            self.tmpc=self.mods.get(self.mods.curselection()[0]) 
+            self.labela['text']='mod版本'
+            self.tmpc=self.mods.get(self.mods.curselection()[0])
+            self.modurls=modurl(self.tmpb,self.tmpc)
             self.mods.delete(0,'end')
-            for i in modurl(self.tmpb,self.tmpc):
-                self.mods.insert('end',i)
+            for i in self.modurls:
+                self.mods.insert('end',i['version'])
             return
         if self.tmpa==2:
             if not self.mods.curselection():
+                mess.showinfo('提示','没有选择mod版本');return
+            self.tmpa=3
+            self.labela['text']='mod加载器'
+            self.buttona.set('下载')
+            self.tmodver=self.mods.get(self.mods.curselection()[0])
+            for i in self.modurls:
+                if i['version']==self.tmodver:
+                    modloader=i['loaders']
+                    break
+            self.mods.delete(0,'end')
+            for i in modloader:
+                self.mods.insert('end',i)
+            return
+        if self.tmpa==3:
+            if not self.mods.curselection():
                 mess.showinfo('提示','没有选择mod加载器');return
             loader=self.mods.get(self.mods.curselection()[0])
-            self.dlp=filedialog.askdirectory()
-            if not self.dlp:return
-            for i in modurl(self.tmpb,self.tmpc,loader)[0]:
-                dnld(i[0],pj(self.dlp,i[1]))
+            for i in self.modurls:
+                if i['version']==self.tmodver and loader in i['loaders']:
+                    f=i['files'][0]
+                    fp=filedialog.asksaveasfilename(title='下载mod',initialfile=f[1])
+                    if not fp:return
+                    mess.showinfo(fp,str(i))
+                    dnld(f[0],fp)
             th.Thread(target=self.searchmod).start()
             mess.showinfo('安装模组','下载完成!')
             return
