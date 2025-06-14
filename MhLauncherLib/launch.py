@@ -185,11 +185,11 @@ def mcjava(v,vd,d='.minecraft',m=True):
 def removemc(ver,d='.minecraft'):
     p=pj(d,'versions',ver,ver+'.json')
     if exists(p):
-        os.remove(p)
+        os.rename(p,'remove_json.json')
         print('删除',p)
     p=pj(d,'versions',ver,ver+'.jar')
     if exists(p):
-        os.remove(p)
+        os.rename(p,'remove_jar.jar')
         print('删除',p)
     print(ver,'删除完毕')   
 '''def downjava(ver,p='java',dp=''):

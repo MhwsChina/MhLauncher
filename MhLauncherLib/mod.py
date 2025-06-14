@@ -17,11 +17,12 @@ def searchmod(mod=None,limit=20,index='downloads',timeout=10) -> list:
     url+='&facets=%5B%5B%22project_type%3Amod%22%5D%5D'
     rs=req.get(url,timeout=timeout)
     return rs.json()['hits']
-def modurl(mod,mcver,loader=None,timeout=10) -> tuple:
+def modurl(mod,mcver,timeout=10) -> tuple:
+    #mod=slug
     url=f'https://api.modrinth.com/v2/project/{mod}/version'
     rs=req.get(url,timeout=timeout)
     dic=rs.json()
-    loaders=[]
+    '''loaders=[]
     for i in dic:
         if not loader:
             if mcver in i['game_versions']:
@@ -32,33 +33,50 @@ def modurl(mod,mcver,loader=None,timeout=10) -> tuple:
             files=[]
             for file in i['files']:
                 files.append((file['url'],file['filename'],file['hashes']))
-            return (files,i['project_id'],i['id'],i['loaders'])
-    return loaders
+            return (files,i['project_id'],i['id'],i['loaders'])'''
+    urls=tuple()
+    for i in dic:
+        if mcver in i['game_versions']:
+            tmp={}
+            files=[]
+            for f in i['files']:
+                files.append((f['url'],f['filename'],f['hashes']))
+            tmp['files']=files
+            tmp['project_id']=i['project_id']
+            tmp['id']=i['id']
+            tmp['loaders']=i['loaders']
+            tmp['version']=i['version_number']
+            tmp['type']=i['version_type']
+            urls=urls+(tmp,)
+    return urls
 def formatsc(sd) -> list:
     ls=[]
     for i in sd:
         ls.append((i['title'],i['versions'],i['slug'],i['icon_url']))
     return ls
 '''
-modurl(mod,mcver,loader) -> tuple
+modurl(mod,mcver) -> tuple
 (
-    files -> list
-    [
-        (
-            url->str,
-            filename->str,
-            sha->dict
-            {
-                'sha1':str,
-                'sha256':str,
-                'sha2':str,
-                ...
-            }
-        )
-    ],
-    project_id,
-    id,
-    modloaders->list['fabric','forge'.......],
+    {
+        files: [
+            (
+                url->str,
+                filename->str,
+                sha->dict
+                {
+                    'sha1':str,
+                    'sha256':str,
+                    'sha2':str,
+                    ...
+                }
+            )
+        ],
+        project_id: str,
+        id: str,
+        loaders: ['fabric','forge'.......],
+        version: str,
+        type: str(release,snapshot....)
+    }...........
 )
 #mod=modname
 formatsc(sd) -> list

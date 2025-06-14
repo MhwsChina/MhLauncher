@@ -8,6 +8,9 @@ from .fabric import *
 from .mod import *
 rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.47
+一些修改
+下载mod时支持自定义版本
 v0.0.46
 修复了启动后Failed to execute script的bug
 v0.0.45
