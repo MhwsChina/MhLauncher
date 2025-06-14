@@ -49,7 +49,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.47',getrizhi()
+version,s3='v0.0.48',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -376,8 +376,10 @@ class main_ui:
         mess.showinfo('安装Fabric/Forge',f'{ver}已成功安装')
     def rmmc(self):
         if not self.vers.curselection():
-            mess.showinfo('提示','没有选择版本');return            
+            mess.showinfo('提示','没有选择版本');return
         ver=self.vers.get(self.vers.curselection()[0])
+        tmp=mess.askyesno('MhLauncher',f'确认删除{ver}吗?')
+        if tmp==False:return
         removemc(ver)
         self.listver()
     def listver(self):
