@@ -49,7 +49,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.48',getrizhi()
+version,s3='v0.0.49',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -462,7 +462,6 @@ class main_ui:
                     f=i['files'][0]
                     fp=filedialog.asksaveasfilename(title='下载mod',initialfile=f[1])
                     if not fp:return
-                    mess.showinfo(fp,str(i))
                     dnld(f[0],fp)
             th.Thread(target=self.searchmod).start()
             mess.showinfo('安装模组','下载完成!')
