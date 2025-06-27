@@ -9,6 +9,7 @@ from .mod import *
 rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
 v0.0.50
+更换更新下载源
 版本列表每隔一会自动刷新
 文字颜色可更改
 v0.0.49
