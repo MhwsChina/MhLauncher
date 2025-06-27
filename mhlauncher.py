@@ -1,6 +1,7 @@
 import tkinter as tk #UI界面
 import tkinter.ttk as ttk#UI界面
 import tkinter.messagebox as mess#UI界面
+import tkinter.colorchooser as cc
 from tkinter import filedialog#UI界面
 from MhLauncherLib import *#MhLauncher
 import webbrowser as webb#打开浏览器
@@ -26,8 +27,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl']
-    ck=[0,256,1,0,2048,0,0,1]
+    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl','ffg']
+    ck=[0,256,1,0,2048,0,0,1,'#ff9300']
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -49,7 +50,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.49',getrizhi()
+version,s3='v0.0.50',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -62,16 +63,18 @@ if opt['check_update']:
     try:
         th.Thread(target=check_update,args=(version,'mhl')).start()
     except:raise;print('失败')
+ffg=opt['ffg']
 def Label(b,si=11,**kw):
-    return tk.Label(b,**kw,highlightthickness=0,fg='#ff9300',font=('consolas',si))
+    return tk.Label(b,**kw,highlightthickness=0,fg=ffg,font=('consolas',si))
 def Listbox(b,si=11,**kw):
-    return tk.Listbox(b,**kw,highlightthickness=0,fg='#ff9300',font=('consolas',si))
+    return tk.Listbox(b,**kw,highlightthickness=0,fg=ffg,font=('consolas',si))
 def Button(b,si=11,**kw):
-    return tk.Button(b,**kw,highlightthickness=0,activebackground='#fba632',relief='groove',fg='#ff9300',font=('consolas',si))
+    #activebackground='#fba632'
+    return tk.Button(b,**kw,highlightthickness=0,activebackground=ffg,relief='groove',fg=ffg,font=('consolas',si))
 def Entry(b,si=11,**kw):
-    return tk.Entry(b,**kw,highlightthickness=0,fg='#ff9300',font=('consolas',si))
+    return tk.Entry(b,**kw,highlightthickness=0,fg=ffg,font=('consolas',si))
 def Radiobutton(b,si=11,**kw):
-    return tk.Radiobutton(b,**kw,highlightthickness=0,fg='#ff9300',font=('consolas',si),relief='flat')
+    return tk.Radiobutton(b,**kw,highlightthickness=0,fg=ffg,font=('consolas',si),relief='flat')
 class main_ui:
     def __init__(self):
         self.tmpa,self.tmpb,self.tmpc=0,0,0
@@ -79,6 +82,7 @@ class main_ui:
         self.createui()
         self.tmpp0=1
         self.mouse=0
+        self.cc=ffg
     def mousep(self):
         if self.mouse>0:
             self.mouse=0
@@ -109,7 +113,7 @@ class main_ui:
             self.w1.attributes('-topmost','true')
             sleep(0.05)
     def createui(self):
-        ttk.Style().configure('TNotebook.Tab',font=('consolas',11),foreground='#ff9300')
+        ttk.Style().configure('TNotebook.Tab',font=('consolas',11),foreground=ffg)
         self.w.title('MhLauncher')
         self.w.overrideredirect(True)
         self.w.resizable(0, 0)
@@ -236,13 +240,19 @@ class main_ui:
         Radiobutton(frm9,text='关闭',variable=self.zd,value=0).pack(side='left',anchor='w')
         Radiobutton(frm9,text='开启',variable=self.zd,value=1).pack(side='left',anchor='e')
         frm9.grid(row=2,column=1,padx=15)
-        Button(self.sett,text='保存设置',command=self.saveopt).grid(row=3,column=1,sticky='e')
+        fra=tk.Frame(self.sett)
+        Button(fra,text='选取文字颜色',command=self.cols).pack()
+        fra.grid(row=3,column=1,padx=15)
+        Button(self.sett,text='保存设置',command=self.saveopt).grid(row=3,column=2,sticky='e')
         #关于
         Label(self.gy,text=f'MhLauncher {version}').pack(anchor='w')
         Label(self.gy,text='(c)Copyright 2025 (炜某晟)_MhwsChina_').pack(anchor='w')
-        gxrz=tk.Text(self.gy,width=45,height=8,fg='#fba632',font=('consolas',11))
-        gxrz.insert('end',s3)
-        gxrz.pack(side='left')
+        vs5=tk.Scrollbar(self.gy,orient='vertical')
+        vs5.pack(side='left',fill='y')
+        self.gxrz=tk.Text(self.gy,width=45,height=8,fg=ffg,font=('consolas',11),yscrollcommand=vs5.set)
+        self.gxrz.insert('end',s3)
+        self.gxrz.pack(side='left')
+        vs5.config(command=self.gxrz.yview)
         Button(self.gy,text='检查更新',command=lambda: th.Thread(target=check_update,args=(version,'mhl',1)).start()).pack(side='left')
         Button(self.gy,text='查看源代码',command=lambda: webb.open('https://github.com/MhwsChina/MhLauncher')).pack(side='left')
         #fabric界面
@@ -313,11 +323,12 @@ class main_ui:
         self.w.geometry(f'+{x}+{y}')
         #######################
         self.loadopt(opt)
-        self.listver()
+        #anself.listver()
         self.sxdlls()
         self.nt0.grid(row=1,column=0,padx=10,pady=5)
         th.Thread(target=self.zhiding).start()
         th.Thread(target=self.searchmod).start()
+        th.Thread(target=self.sxver).start()
         self.flushtask()
         #获取运行内存self.mb.get()
         #获取下载线程self.dlth.get()
@@ -325,6 +336,16 @@ class main_ui:
         #获取检查更新self.checkup.get()
         #是否全面补全文件self.bqwj.get()
         #版本隔离self.gl.get()'''
+    def sxver(self):
+        while 1:
+            self.listver()
+            time.sleep(3)
+    def cols(self):
+        tmp=cc.askcolor()
+        if tmp[0]==None:return
+        self.cc=tmp[1]
+        mess.showinfo('setting','设置颜色成功,需重启程序才能生效!')
+        self.saveopt()
     def runui(self):
         self.w.mainloop()
     def loadopt(self,opt):
@@ -342,6 +363,7 @@ class main_ui:
         opt['bqwj']=self.bqwj.get()
         opt['gl']=self.gl.get()
         opt['mb']=self.mb.get()
+        opt['ffg']=self.cc
         upopt(opt)
     def setus(self,event):
         opt['opt']['username']=self.usbox.get()
