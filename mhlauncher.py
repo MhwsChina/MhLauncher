@@ -50,7 +50,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.50',getrizhi()
+version,s3='v0.0.51',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -356,6 +356,7 @@ class main_ui:
         self.bqwj.set(opt['bqwj'])
         self.gl.set(opt['gl'])
         self.usbox.insert(0,opt['opt']['username'])
+        slb(Label)
     def saveopt(self):
         opt['thread']=self.dlth.get()
         opt['bm']=self.bm.get()
@@ -405,9 +406,11 @@ class main_ui:
         removemc(ver)
         self.listver()
     def listver(self):
+        tmpv=allv()
+        if len(tmpv)==self.vers.size():return
         self.vers.delete(0,'end')
         self.vers1.delete(0,'end')
-        for i in allv():
+        for i in tmpv:
             self.vers.insert('end',i)
             self.vers1.insert('end',i)
     def dlmc(self):
