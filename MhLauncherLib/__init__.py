@@ -6,8 +6,11 @@ from .args import *
 from .java import *
 from .fabric import *
 from .mod import *
+from .xcdl import *
 rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.51
+修复了一些bug
 v0.0.50
 更换更新下载源
 版本列表每隔一会自动刷新

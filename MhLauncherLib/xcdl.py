@@ -3,11 +3,16 @@ import requests as rq
 import os,random,hashlib
 from sys import stdout
 from time import sleep
+from .log import *
 #from tqdm import tqdm
 f,f1,th,us=0,0,0,[]
 thr=0
 hashing=0
 threads=[]
+lb=None
+def slb(l):
+    global lb
+    lb=l
 def pj(*args):
     return os.path.join(*args).replace('\\','/')
 def exists(p):
@@ -124,10 +129,10 @@ def xcdnld(urls,paths,thread,sha=[],tk=None,wt='下载中',join=False):
         top.geometry('200x100')
         tmp0,tmp1,tmp2=tk.StringVar(),tk.StringVar(),tk.StringVar()
         tim=tk.StringVar()
-        tk.Label(top,textvariable=tmp0,fg='#ff9300',font=('consolas',11)).pack()
-        tk.Label(top,textvariable=tmp1,fg='#ff9300',font=('consolas',11)).pack()
-        tk.Label(top,textvariable=tmp2,fg='#ff9300',font=('consolas',11)).pack()
-        tk.Label(top,textvariable=tim,fg='#ff9300',font=('consolas',11)).pack()
+        lb(top,textvariable=tmp0).pack()
+        lb(top,textvariable=tmp1).pack()
+        lb(top,textvariable=tmp2).pack()
+        lb(top,textvariable=tim).pack()
         thd.Thread(target=jd_ui,args=(tmp0,tmp1,tmp2,tim,top)).start()
 def joindl():
     global thr,th
