@@ -50,7 +50,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.51',getrizhi()
+version,s3='v0.0.52',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -166,7 +166,10 @@ class main_ui:
         vs0.config(command=self.vers.yview)
         frml.grid(column=0,row=0,rowspan=2,padx=10,pady=5)
         frmne=tk.Frame(self.gm)
-        Label(frmne,text='游戏名').pack(side='top',anchor='center',padx=2,pady=5)
+        frmnee=tk.Frame(frmne)
+        Label(frmnee,text='游戏名').pack(side='left',padx=2,pady=5)
+        #Button(frmnee,text='正版登录').pack(side='left',padx=2,pady=5)
+        frmnee.pack(padx=2,pady=5,anchor='center')
         self.usbox=Entry(frmne)
         self.usbox.bind('<Return>',self.setus)
         self.usbox.pack(side='bottom',anchor='s',padx=2,pady=5)
@@ -470,10 +473,12 @@ class main_ui:
             self.labela['text']='mod加载器'
             self.buttona.set('下载')
             self.tmodver=self.mods.get(self.mods.curselection()[0])
+            modloader=[]
             for i in self.modurls:
                 if i['version']==self.tmodver:
-                    modloader=i['loaders']
-                    break
+                    for i in i['loaders']:
+                        if not i in modloader:
+                            modloader.append(i)
             self.mods.delete(0,'end')
             for i in modloader:
                 self.mods.insert('end',i)
@@ -488,6 +493,7 @@ class main_ui:
                     fp=filedialog.asksaveasfilename(title='下载mod',initialfile=f[1])
                     if not fp:return
                     dnld(f[0],fp)
+                    break
             th.Thread(target=self.searchmod).start()
             mess.showinfo('安装模组','下载完成!')
             return
