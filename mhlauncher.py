@@ -28,7 +28,7 @@ def init():
     return dic
 def fdic(dic={}):
     ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl','text_color','font']
-    ck=[0,256,1,0,2048,0,0,1,'#000000','@Fixedsys']
+    ck=[0,128,1,0,2048,0,0,1,'#000000','@Fixedsys']
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -50,7 +50,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.53',getrizhi()
+version,s3='v0.0.54',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -59,11 +59,11 @@ log('正在获取版本列表...')
 vdc=verdict()
 log('完成!')
 if opt['check_update']:
-    print('正在检查更新')
+    log('正在检查更新')
     try:
         th.Thread(target=check_update,args=(version,'mhl')).start()
-    except:print('失败')
-ffg=opt['ffg']
+    except:log('失败')
+ffg=opt['text_color']
 font=opt['font']
 def Label(b,si=11,**kw):
     return tk.Label(b,**kw,highlightthickness=0,fg=ffg,font=(font,si))
@@ -109,7 +109,7 @@ class main_ui:
             self.tmpp0-=1
     def zhiding(self):
         while 1:
-            #if self.zd.get():self.w.attributes('-topmost',1)
+            if self.zd.get():self.w.attributes('-topmost',1)
             #else:self.w.attributes('-topmost',0)
             self.w1.attributes('-topmost','true')
             sleep(0.05)
@@ -367,6 +367,7 @@ class main_ui:
         opt['mb']=self.mb.get()
         opt['ffg']=self.cc
         upopt(opt)
+        mess.showinfo('完成','保存成功')
     def setus(self,event):
         opt['opt']['username']=self.usbox.get()
         upopt(opt)
