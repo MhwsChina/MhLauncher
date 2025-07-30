@@ -50,7 +50,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.55',getrizhi()
+version,s3='v0.0.56',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -309,15 +309,20 @@ class main_ui:
         vs4.config(command=self.tasks.yview)
         frm14.grid(row=0,column=0,padx=10,pady=5)
         frm15=tk.Frame(self.gjbox)
-        Button(frm15,text='刷新进程列表',command=self.flushtask).pack()
-        Button(frm15,text='关闭所有该名字的进程',command=self.kill).pack()
-        Button(frm15,text='关闭并删除',command=self.rmtask).pack()
-        Button(frm15,text='删除该进程的文件夹(卸载)',command=lambda: self.rmtask(1)).pack()
+        Button(frm15,text='刷新进程列表',command=self.flushtask).grid(column=0,row=0,columnspan=3)
+        Button(frm15,text='关闭',command=self.kill).grid(column=0,row=1)
+        Button(frm15,text='冻结',command=self.suspend).grid(column=1,row=1)
+        Button(frm15,text='解冻',command=self.resume).grid(column=2,row=1)
+        Button(frm15,text='关闭并删除',command=self.rmtask).grid(column=0,row=2,columnspan=3)
+        Button(frm15,text='删除该进程的文件夹(卸载)',command=lambda: self.rmtask(1)).grid(column=0,row=3,columnspan=3)
         #tk.Button(frm15,text='获取详细信息').pack()
-        Label(frm15,text='命令执行(cmd不可用时)').pack()
-        self.cmdt=Entry(frm15)
+        frm151=tk.Frame(frm15)
+        Label(frm151,text='命令执行/进程搜索').pack()
+        self.cmdt=Entry(frm151)
         self.cmdt.pack()
-        Button(frm15,text='执行',command=lambda: self.cmd(self.cmdt.get())).pack()
+        frm151.grid(column=0,row=4,columnspan=4)
+        Button(frm15,text='执行',command=lambda: self.cmd(self.cmdt.get())).grid(column=0,row=5)
+        Button(frm15,text='搜索',command=lambda: self.flushtask(self.cmdt.get())).grid(column=1,row=5)
         frm15.grid(row=0,column=1,padx=10,pady=5)
         x=int((self.w.winfo_screenwidth()-self.w.winfo_reqwidth())/2)
         y=int((self.w.winfo_screenheight()-self.w.winfo_reqheight())/2)
@@ -503,11 +508,20 @@ class main_ui:
         for i in psutil.process_iter():
             ts.append((i.pid,i.name()))
         return ts
-    def flushtask(self):
-        self.tt=self.getalltask()
+    def flushtask(self,search=False):
+        if search:self.tt=sorted(self.srchtask(search),key=lambda a:a[1])
+        else:self.tt=sorted(self.getalltask(),key=lambda a:a[1])
         self.tasks.delete(0,'end')
         for i in self.tt:
-            self.tasks.insert('end',i[1]+'    pid='+str(i[0]))
+            self.tasks.insert('end','pid='+str(i[0])+'   '+str(i[1]))
+    def srchtask(self,t):
+        ts=[]
+        t=t.lower()
+        for i in psutil.process_iter():
+            n=i.name().lower()
+            if n==t or t in n or n in t:
+                ts.append((i.pid,i.name()))
+        return ts
     def cmd(self,cmd):
         th.Thread(target=sub.run,args=(cmd,)).start()
     def kill(self):
@@ -523,6 +537,20 @@ class main_ui:
             if tmp:break
             self.getpid(nm)
         self.flushtask()
+    def suspend(self):
+        if not self.tasks.curselection():return
+        nm=self.tt[self.tasks.curselection()[0]][1]
+        for i in self.getpid(nm):
+            try:psutil.Process(i).suspend()
+            except:pass
+            sleep(0.5)
+    def resume(self):
+        if not self.tasks.curselection():return
+        nm=self.tt[self.tasks.curselection()[0]][1]
+        for i in self.getpid(nm):
+            try:psutil.Process(i).resume()
+            except:pass
+            sleep(0.5)
     def getpid(self,name):
         return [i.pid for i in psutil.process_iter() if i.name()==name]
     def killp(self,name):
