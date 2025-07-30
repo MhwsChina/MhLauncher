@@ -27,8 +27,8 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl','ffg']
-    ck=[0,256,1,0,2048,0,0,1,'#ff9300']
+    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl','text_color','font']
+    ck=[0,256,1,0,2048,0,0,1,'#000000','@Fixedsys']
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic:
@@ -50,7 +50,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.52',getrizhi()
+version,s3='v0.0.53',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -62,19 +62,20 @@ if opt['check_update']:
     print('正在检查更新')
     try:
         th.Thread(target=check_update,args=(version,'mhl')).start()
-    except:raise;print('失败')
+    except:print('失败')
 ffg=opt['ffg']
+font=opt['font']
 def Label(b,si=11,**kw):
-    return tk.Label(b,**kw,highlightthickness=0,fg=ffg,font=('consolas',si))
+    return tk.Label(b,**kw,highlightthickness=0,fg=ffg,font=(font,si))
 def Listbox(b,si=11,**kw):
-    return tk.Listbox(b,**kw,highlightthickness=0,fg=ffg,font=('consolas',si))
+    return tk.Listbox(b,**kw,highlightthickness=0,fg=ffg,font=(font,si))
 def Button(b,si=11,**kw):
     #activebackground='#fba632'
-    return tk.Button(b,**kw,highlightthickness=0,activebackground=ffg,relief='groove',fg=ffg,font=('consolas',si))
+    return tk.Button(b,**kw,highlightthickness=0,activebackground=ffg,relief='groove',fg=ffg,font=(font,si))
 def Entry(b,si=11,**kw):
-    return tk.Entry(b,**kw,highlightthickness=0,fg=ffg,font=('consolas',si))
+    return tk.Entry(b,**kw,highlightthickness=0,fg=ffg,font=(font,si))
 def Radiobutton(b,si=11,**kw):
-    return tk.Radiobutton(b,**kw,highlightthickness=0,fg=ffg,font=('consolas',si),relief='flat')
+    return tk.Radiobutton(b,**kw,highlightthickness=0,fg=ffg,font=(font,si),relief='flat')
 class main_ui:
     def __init__(self):
         self.tmpa,self.tmpb,self.tmpc=0,0,0
@@ -83,8 +84,8 @@ class main_ui:
         self.tmpp0=1
         self.mouse=0
         self.cc=ffg
-    def mousep(self):
-        if self.mouse>0:
+    def mousep(self,e=None):
+        if self.mouse>0 or e:
             self.mouse=0
             self.m1.set('移动窗口')
             return
@@ -108,34 +109,31 @@ class main_ui:
             self.tmpp0-=1
     def zhiding(self):
         while 1:
-            if self.zd.get():self.w.attributes('-topmost',1)
-            else:self.w.attributes('-topmost',0)
+            #if self.zd.get():self.w.attributes('-topmost',1)
+            #else:self.w.attributes('-topmost',0)
             self.w1.attributes('-topmost','true')
             sleep(0.05)
+    def resetui(self):
+        self.w.state('normal')
+        self.w.attributes('-topmost',1)
     def createui(self):
-        ttk.Style().configure('TNotebook.Tab',font=('consolas',11),foreground=ffg)
+        ttk.Style().configure('TNotebook.Tab',font=(font,11),foreground=ffg)
         self.w.title('MhLauncher')
         self.w.overrideredirect(True)
         self.w.resizable(0, 0)
         self.w1=tk.Toplevel(self.w)
         self.w1.resizable(0, 0)
         self.w1.overrideredirect(True)
+        self.w.attributes('-topmost',1)
         self.w1.geometry(f'+0+0')
-        '''self.image = Image.open("R-C.jpg")
-        self.photo=ImageTk.PhotoImage(self.image)
-        background=tk.Canvas(self.w)
-        background.create_image(200,100,image=self.photo)
-        background.grid(column=0,row=1)'''
-        Button(self.w1,text='MhLauncher',bd=0,command=lambda: self.w.state('normal')).pack()
-        '''self.w.bind('<ButtonPress-1>',self.mousep)
-        self.w.bind('<ButtonRelease-1>',self.mouser)
-        self.w.bind("<B1-Motion>",self.mousem)'''
+        Button(self.w1,text='MhLauncher',bd=0,command=self.resetui).pack()
         title=tk.Frame(self.w)
         Label(title,text=f'MhLauncher {version}',si=13).pack()
         title.grid(row=0,column=0,sticky='w',pady=5,padx=5)
         self.m1=tk.StringVar()
         self.m1.set('移动窗口')
         Button(self.w,textvariable=self.m1,command=self.mousep,si=10).grid(row=0,column=0,padx=5)
+        self.w.bind('<Escape>',self.mousep)
         closew=tk.Frame(self.w)
         Button(closew,text='-',bd=0,command=self.iconify).grid(row=0,column=0,padx=10)
         Button(closew,text='x',bd=0,command=self.exit).grid(row=0,column=1,padx=10)
@@ -252,7 +250,7 @@ class main_ui:
         Label(self.gy,text='(c)Copyright 2025 (炜某晟)_MhwsChina_').pack(anchor='w')
         vs5=tk.Scrollbar(self.gy,orient='vertical')
         vs5.pack(side='left',fill='y')
-        self.gxrz=tk.Text(self.gy,width=45,height=8,fg=ffg,font=('consolas',11),yscrollcommand=vs5.set)
+        self.gxrz=tk.Text(self.gy,width=45,height=8,fg=ffg,font=(font,11),yscrollcommand=vs5.set)
         self.gxrz.insert('end',s3)
         self.gxrz.pack(side='left')
         vs5.config(command=self.gxrz.yview)
