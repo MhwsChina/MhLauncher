@@ -2,6 +2,7 @@ import requests as req
 from json import loads
 import sys,os,shutil
 import tkinter.messagebox as mess
+import pyperclip as pc
 from .xcdl import *
 from .log import *
 def check_update(now_version,save_path='',oot=0,write_path=sys.argv[0],api_url='https://api.github.com/repos/MhwsChina/MhLauncher/tags',dlurl='https://github.com/MhwsChina/MhLauncher/releases/download/%tagver%/Launcher.exe',timeout=3):
@@ -11,14 +12,16 @@ def check_update(now_version,save_path='',oot=0,write_path=sys.argv[0],api_url='
             js=loads(req.get(api_url,timeout=timeout,verify=False).text)
         except:
             i+=1
-            if i==4:raise RuntimeError('无法获取更新')
+            if i==4:
+                mess.showerror('ERROR','检查更新失败(可能是网络问题?)')
+                raise RuntimeError('无法获取更新')
             log('获取更新失败,正在重试第'+str(i)+'次!')
     latest=js[0]
     n=list(map(int,latest['name'].replace('v','').split('.')))
     n1=list(map(int,now_version.replace('v','').split('.')))
     p=pj(save_path,'update.tmp')
     if n[0]>n1[0] or n[1]>n1[1] or n[2]>n1[2]:
-        ur=['https://github.dpik.top/','https://gh.llkk.cc/','https://gh.dpik.top/']
+        ur=['https://github.dpik.top/','https://gh.llkk.cc/','https://gh.dpik.top/','']
         ok=False
         for i in ur:
             try:
@@ -28,7 +31,8 @@ def check_update(now_version,save_path='',oot=0,write_path=sys.argv[0],api_url='
             except:pass
         if not ok:
             log('update error!!!!!!!')
-            mess.showerror('错误','无法下载更新,请手动下载(可能是网络问题?)\n网址(已自动复制):\nhttps://wwzb.lanzouw.com/b00y9z56ne=\n提取码:2025')
+            pc.copy('https://wwzb.lanzouw.com/b00y9z56ne')
+            mess.showerror('ERROR','自动更新失败(可能是网络问题?),请手动下载\n网址(已自动复制):\nhttps://wwzb.lanzouw.com/b00y9z56ne\n提取码:2025')
             return
         shutil.move(sys.argv[0],pj(save_path,'OLD_LAUNCHER'))
         f=open(p,'rb')
