@@ -9,6 +9,8 @@ from .mod import *
 from .xcdl import *
 rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.54
+一些修改
 v0.0.53
 按esc可以取消移动窗口
 v0.0.52
