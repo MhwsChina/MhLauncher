@@ -50,7 +50,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.54',getrizhi()
+version,s3='v0.0.55',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -345,8 +345,8 @@ class main_ui:
         tmp=cc.askcolor()
         if tmp[0]==None:return
         self.cc=tmp[1]
-        mess.showinfo('setting','设置颜色成功,需重启程序才能生效!')
         self.saveopt()
+        mess.showinfo('setting','设置颜色成功,需重启程序才能生效!')
     def runui(self):
         self.w.mainloop()
     def loadopt(self,opt):
@@ -365,9 +365,9 @@ class main_ui:
         opt['bqwj']=self.bqwj.get()
         opt['gl']=self.gl.get()
         opt['mb']=self.mb.get()
-        opt['ffg']=self.cc
+        opt['text_color']=self.cc
         upopt(opt)
-        mess.showinfo('完成','保存成功')
+        mess.showinfo('保存设置','保存成功')
     def setus(self,event):
         opt['opt']['username']=self.usbox.get()
         upopt(opt)
