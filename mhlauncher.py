@@ -27,11 +27,11 @@ def init():
     upopt(dic)
     return dic
 def fdic(dic={}):
-    ch=['opt','thread','check_update','bqwj','mb','outlog','bm','gl','text_color','font']
-    ck=[0,128,1,0,2048,0,0,1,'#000000','@Fixedsys']
+    ch=['opt','users','thread','check_update','bqwj','mb','outlog','bm','gl','text_color','font']
+    ck=[0,[],128,1,0,2048,0,0,1,'#000000','@Fixedsys']
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
-        if not c in dic:
+        if not c in dic or c in dic and type(k)!=type(dic[c]):
             if c=='opt':
                 dic['opt']={}
                 dic['opt']['username']=''
@@ -50,7 +50,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.57',getrizhi()
+version,s3='v0.0.58',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -74,6 +74,8 @@ def Button(b,si=11,**kw):
     return tk.Button(b,**kw,highlightthickness=0,activebackground=ffg,relief='groove',fg=ffg,font=(font,si))
 def Entry(b,si=11,**kw):
     return tk.Entry(b,**kw,highlightthickness=0,fg=ffg,font=(font,si))
+def Combobox(b,si=11,**kw):
+    return ttk.Combobox(b,**kw,foreground=ffg,background=ffg,font=(font,si))
 def Radiobutton(b,si=11,**kw):
     return tk.Radiobutton(b,**kw,highlightthickness=0,fg=ffg,font=(font,si),relief='flat')
 class main_ui:
@@ -166,9 +168,10 @@ class main_ui:
         frmne=tk.Frame(self.gm)
         frmnee=tk.Frame(frmne)
         Label(frmnee,text='游戏名').pack(side='left',padx=2,pady=5)
+        Button(frmnee,text='删除该名',command=self.rmus).pack(padx=2,pady=5)
         #Button(frmnee,text='正版登录').pack(side='left',padx=2,pady=5)
         frmnee.pack(padx=2,pady=5,anchor='center')
-        self.usbox=Entry(frmne)
+        self.usbox=Combobox(frmne)
         self.usbox.bind('<Return>',self.setus)
         self.usbox.pack(side='bottom',anchor='s',padx=2,pady=5)
         frmne.grid(column=1,row=0,padx=10,pady=5)
@@ -362,6 +365,7 @@ class main_ui:
         self.bqwj.set(opt['bqwj'])
         self.gl.set(opt['gl'])
         self.usbox.insert(0,opt['opt']['username'])
+        self.setus()
         slb(Label)
     def saveopt(self):
         opt['thread']=self.dlth.get()
@@ -373,11 +377,28 @@ class main_ui:
         opt['text_color']=self.cc
         upopt(opt)
         mess.showinfo('保存设置','保存成功')
-    def setus(self,event):
-        opt['opt']['username']=self.usbox.get()
+    def setus(self,event=None):
+        usr=self.usbox.get()
+        if not usr:
+            if opt['opt']['username']:
+                usr=opt['opt']['username']
+            else:
+                if opt['users']:
+                    usr=opt['users'][0]
+                else:return
+            self.usbox.insert(0,usr)
+        if not usr in opt['users']:opt['users'].append(usr)
+        self.usbox['values']=opt['users']
+        opt['opt']['username']=usr
         upopt(opt)
+    def rmus(self):
+        usr=self.usbox.get()
+        if usr:
+            if usr in opt['users']:opt['users'].remove(usr)
+            if opt['users']:self.usbox['text']=opt['users'][0]
+            self.setus()
     def runmc(self,out=None):
-        if self.usbox.get()!='':self.setus(1)
+        if self.usbox.get()!='':self.setus()
         else:mess.showinfo('提示','请先输入游戏名');return
         if not self.vers.curselection():
             mess.showinfo('提示','没有选择版本');return            
