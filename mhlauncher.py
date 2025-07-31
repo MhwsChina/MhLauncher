@@ -28,7 +28,7 @@ def init():
     return dic
 def fdic(dic={}):
     ch=['opt','users','thread','check_update','bqwj','mb','outlog','bm','gl','text_color','font']
-    ck=[0,[],128,1,0,2048,0,0,1,'#000000','@Fixedsys']
+    ck=[{},[],128,1,0,2048,0,0,1,'#000000','@Fixedsys']
     for i in range(len(ch)):
         c,k=ch[i],ck[i]
         if not c in dic or c in dic and type(k)!=type(dic[c]):
@@ -50,7 +50,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.58',getrizhi()
+version,s3='v0.0.59',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -379,7 +379,11 @@ class main_ui:
         mess.showinfo('保存设置','保存成功')
     def setus(self,event=None):
         usr=self.usbox.get()
-        if not usr:
+        if usr:
+            if not opt['opt']['username'] in opt['users']:
+                opt['users'].append(opt['opt']['username'])
+            opt['opt']['username']=usr
+        else:
             if opt['opt']['username']:
                 usr=opt['opt']['username']
             else:
