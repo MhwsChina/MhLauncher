@@ -51,7 +51,7 @@ def setmem():
     return []
 def fmmb(c):
     return ['-Xmx'+str(c)+'M','-Xmn'+'256'+'M']
-def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,marg=[],outlog=False,out=None,gl=False,bm=False,d='.minecraft'):
+def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,marg=[],outlog=False,out=False,gl=False,bm=False,d='.minecraft'):
     print('正在补全文件...')
     dc=readv(ver)
     if 'inheritsFrom' in dc:
@@ -64,14 +64,12 @@ def runmc(ver,vdc,javaw,o=None,bqthread=128,sha=0,marg=[],outlog=False,out=None,
     if outlog:javaw=javaw.replace('javaw','java')
     cmd=getmcargs(ver,javaw,o,marg,d,gl)
     if out:
-        cmd[0]='"{}"'.format(cmd[0].replace('"',''))
-        with open(out,'w',encoding='utf-8') as f:
-            f.write(' '.join(cmd))
-            mess.showinfo('awa','导出启动脚本完成')
+        return cmd
     else:
         print('正在启动',ver)
         th.Thread(target=mess.showinfo,args=('awa','启动成功,游戏窗口待会出现')).start()
         sub.call(cmd,creationflags=sub.CREATE_NO_WINDOW)
+    return 0
 def bqwj(ver,vdc,di,thread,sha=0):
     f=pj(di,'versions/'+ver+'/'+ver+'.json')
     f=open(f,'r')
