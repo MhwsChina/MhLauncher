@@ -9,6 +9,8 @@ from .mod import *
 from .xcdl import *
 rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.61
+修复了一些bug
 v0.0.60
 添加查看游戏日志的功能
 v0.0.59
