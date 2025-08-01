@@ -55,7 +55,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.60',getrizhi()
+version,s3='v0.0.61',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -464,6 +464,7 @@ class main_ui:
                 f.write(' '.join(cmd))
                 mess.showinfo('awa','导出启动脚本完成')
         else:
+            th.Thread(target=mess.showinfo,args=('awa','启动成功,游戏窗口待会出现')).start()
             p = sub.Popen(cmd,stdout=sub.PIPE,stderr=sub.PIPE,creationflags=sub.CREATE_NO_WINDOW)
             self.gamerun[ver]=''
             self.gamelog(f1=ver)
@@ -474,7 +475,6 @@ class main_ui:
                     self.gamelog((ver,line1))
                 except:pass
             p.wait()
-            self.gamerun[ver]=''
     def fabric(self): 
         if not self.vers1.curselection():
             mess.showinfo('提示','没有选择版本');return            
