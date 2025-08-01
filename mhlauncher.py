@@ -38,6 +38,11 @@ def fdic(dic={}):
                 dic['opt']['uuid']=getuuid(dic['opt']['username'])
                 dic['opt']['token']=dic['opt']['uuid']
             else: dic[c]=k
+        if c=='users':
+            users=[]
+            for i in dic[c]:
+               if i:users.append(i)
+            dic[c]=users
     return dic
 def upopt(opt):
     with open('mhl/options.json','w') as f:
@@ -50,7 +55,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.59',getrizhi()
+version,s3='v0.0.60',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -65,10 +70,15 @@ if opt['check_update']:
     except:log('失败')
 ffg=opt['text_color']
 font=opt['font']
+if exists('logs'):
+    try:shutil.rmtree('logs')
+    except:pass
 def Label(b,si=11,**kw):
     return tk.Label(b,**kw,highlightthickness=0,fg=ffg,font=(font,si))
 def Listbox(b,si=11,**kw):
     return tk.Listbox(b,**kw,highlightthickness=0,fg=ffg,font=(font,si))
+def Text(b,si=11,**kw):
+    return tk.Text(b,**kw,highlightthickness=0,fg=ffg,font=(font,si))
 def Button(b,si=11,**kw):
     #activebackground='#fba632'
     return tk.Button(b,**kw,highlightthickness=0,activebackground=ffg,relief='groove',fg=ffg,font=(font,si))
@@ -153,6 +163,8 @@ class main_ui:
         self.nt0.add(self.sett,text='设置')
         self.gjbox=tk.Frame()
         self.nt0.add(self.gjbox,text='工具箱')
+        self.log=tk.Frame()
+        self.nt0.add(self.log,text='日志')
         self.gy=tk.Frame()
         self.nt0.add(self.gy,text='关于')
         #启动界面
@@ -251,12 +263,14 @@ class main_ui:
         #关于
         Label(self.gy,text=f'MhLauncher {version}').pack(anchor='w')
         Label(self.gy,text='(c)Copyright 2025 (炜某晟)_MhwsChina_').pack(anchor='w')
-        vs5=tk.Scrollbar(self.gy,orient='vertical')
-        vs5.pack(side='left',fill='y')
-        self.gxrz=tk.Text(self.gy,width=45,height=8,fg=ffg,font=(font,11),yscrollcommand=vs5.set)
+        gy1=tk.Frame(self.gy)
+        vs5=tk.Scrollbar(gy1,orient='vertical')
+        vs5.pack(side='right',fill='y')
+        self.gxrz=Text(gy1,width=45,height=8,yscrollcommand=vs5.set)
         self.gxrz.insert('end',s3)
         self.gxrz.pack(side='left')
         vs5.config(command=self.gxrz.yview)
+        gy1.pack(side='left')
         Button(self.gy,text='检查更新',command=lambda: th.Thread(target=check_update,args=(version,'mhl',1)).start()).pack(side='left')
         Button(self.gy,text='查看源代码',command=lambda: webb.open('https://github.com/MhwsChina/MhLauncher')).pack(side='left')
         #fabric界面
@@ -330,6 +344,18 @@ class main_ui:
         x=int((self.w.winfo_screenwidth()-self.w.winfo_reqwidth())/2)
         y=int((self.w.winfo_screenheight()-self.w.winfo_reqheight())/2)
         self.w.geometry(f'+{x}+{y}')
+        #日志
+        self.gamerun={}
+        self.verr=Combobox(self.log)
+        self.verr.bind("<<ComboboxSelected>>",lambda a:self.gamelog(f1=self.verr.get())) 
+        self.verr.grid(row=0,column=0)
+        log1=tk.Frame(self.log)
+        vs6=tk.Scrollbar(log1,orient='vertical')
+        vs6.pack(side='right',fill='y')
+        self.glog=Text(log1,width=55,height=12,yscrollcommand=vs6.set)
+        vs6.config(command=self.glog.yview)
+        self.glog.pack(side='left')
+        log1.grid(row=0,column=1)
         #######################
         self.loadopt(opt)
         #anself.listver()
@@ -338,6 +364,7 @@ class main_ui:
         th.Thread(target=self.zhiding).start()
         th.Thread(target=self.searchmod).start()
         th.Thread(target=self.sxver).start()
+        th.Thread(target=self.gamelog).start()
         self.flushtask()
         #获取运行内存self.mb.get()
         #获取下载线程self.dlth.get()
@@ -401,19 +428,53 @@ class main_ui:
             if usr in opt['users']:opt['users'].remove(usr)
             if opt['users']:self.usbox['text']=opt['users'][0]
             self.setus()
-    def runmc(self,out=None):
+    def gamelog(self,f=0,f1=0):
+        if f:
+            if f[0]==self.games:
+                self.glog.insert('end',f[1])
+                self.glog.see('end')
+            return
+        if f1:
+            self.games=f1
+            self.glog.delete('1.0','end')
+            self.glog.insert('end',self.gamerun[self.games])
+            self.glog.see('end')
+            return
+        self.games=0
+        while 1:
+            self.verr['values']=[i for i in self.gamerun.keys()]
+            time.sleep(0.1)
+    def runmc(self,out=False):
         if self.usbox.get()!='':self.setus()
         else:mess.showinfo('提示','请先输入游戏名');return
         if not self.vers.curselection():
             mess.showinfo('提示','没有选择版本');return            
         ver=self.vers.get(self.vers.curselection()[0])
-        if out:out=ver+'.bat'
         j=mcjava(ver,vdc)
         try:javaw=fjava(ls=['mhl/java'],t=1)[j]
         except:
             downjava(mcjava(ver,vdc,m=False),'./mhl/java',self.dlth.get())
             javaw=fjava(ls=['mhl/java'],t=1)[j]
-        runmc(ver,vdc,javaw,opt['opt'],self.dlth.get(),self.bqwj.get(),fmmb(self.mb.get()),False,out,self.gl.get(),self.bm.get())
+        cmd=runmc(ver,vdc,javaw,opt['opt'],self.dlth.get(),self.bqwj.get(),fmmb(self.mb.get()),1,1,self.gl.get(),self.bm.get())
+        if out:
+            cmd[0]='"{}"'.format(cmd[0].replace('"',''))
+            for i in range(len(cmd)):
+                if ' ' in cmd[i]:cmd[i]=f'"{cmd[i]}"'
+            with open('run'+ver+'.bat','w',encoding='utf-8') as f:
+                f.write(' '.join(cmd))
+                mess.showinfo('awa','导出启动脚本完成')
+        else:
+            p = sub.Popen(cmd,stdout=sub.PIPE,stderr=sub.PIPE,creationflags=sub.CREATE_NO_WINDOW)
+            self.gamerun[ver]=''
+            self.gamelog(f1=ver)
+            for line in iter(p.stdout.readline, b''):
+                try:
+                    line1=line.decode('utf-8').strip()+'\n'
+                    self.gamerun[ver]+=line1
+                    self.gamelog((ver,line1))
+                except:pass
+            p.wait()
+            self.gamerun[ver]=''
     def fabric(self): 
         if not self.vers1.curselection():
             mess.showinfo('提示','没有选择版本');return            
