@@ -55,7 +55,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.61',getrizhi()
+version,s3='v0.0.62',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
