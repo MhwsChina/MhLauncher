@@ -40,36 +40,40 @@ def getfg():
     if platform.system()=='Windows':
         return ';'
     else:return ':'
+def fmcp(cp,rn=False):
+    cp=cp.split(':')
+    cp[0]=cp[0].replace('.','/')
+    cp[2]=f'{cp[2]}/{cp[1]}-{cp[2]}'
+    if len(cp)==4:
+        cp[2]+=f'-{cp[3]}'
+        del cp[3]
+    cp[2]+='.jar'
+    if rn:return ('/'.join(cp),cp[1])
+    return '/'.join(cp)
 def getcp(ver,d='.minecraft',cl=True):
     fg=getfg()
     v=readv(ver,d)
-    classpath=''
+    cps,ns=[],[]
+    for c in v['libraries']:
+        if 'rules' in c and not parsel(c['rules']):continue
+        f,n=fmcp(c['name'],1)
+        cps.append(pj(d,'libraries',f))
+        ns.append(n)
     if 'inheritsFrom' in v:
-        classpath+=getcp(v['inheritsFrom'],d,False)
+        cps1=[]
+        for f,n in getcp(v['inheritsFrom'],d,False):
+            if not n in ns:
+                cps1.append(f)
+        cps=cps1+cps
         veri=v['inheritsFrom']
     else:veri=ver
-    for c in v['libraries']:
-        p=False
-        if 'rules' in c and not parsel(c['rules']):continue
-        tags=c['name'].split(':')
-        if len(tags)==3:
-            p,n,vs=tags
-            p=p.replace('.','/')
-            f=f'{p}/{n}/{vs}/{n}-{vs}.jar'
-            path=pj(d,f'libraries/{f}')
-        elif len(tags)==4:
-            p,n,vs,xt=tags
-            p=p.replace('.','/')
-            f=f'{p}/{n}/{vs}/{n}-{vs}-{xt}.jar'
-            path=pj(d,f'libraries/{f}')
-        else:continue
-        classpath+=path+fg
     if cl:
         if v['mainClass']=='cpw.mods.bootstraplauncher.BootstrapLauncher':
-            classpath+=pj(d,'versions',ver,ver+'.jar')
+            cps.append(pj(d,'versions',ver,ver+'.jar'))
         else:
-            classpath+=pj(d,'versions',veri,veri+'.jar')
-    return classpath
+            cps.append(pj(d,'versions',veri,veri+'.jar'))
+        return fg.join(cps)
+    else:return list(zip(cps,ns))
 def fmarg(txt,ver,classpath,v,opt,gmdir,d='.minecraft',fg=getfg()):
     if 'assets' in v:
         txt=txt.replace('${natives_directory}',pj(d,f'versions/{ver}/{ver}-natives'))\
