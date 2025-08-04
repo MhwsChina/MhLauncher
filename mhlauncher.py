@@ -55,7 +55,7 @@ def walk(root,path=''):
         if os.path.isdir(pj(root,path,i)):paths=paths+walk(root,pj(path,i))
         paths.append((root,path,i))
     return paths
-version,s3='v0.0.62',getrizhi()
+version,s3='v0.0.63',getrizhi()
 log('正在加载配置文件...')
 opt=init()
 log('完成!')
@@ -421,13 +421,15 @@ class main_ui:
         if not usr in opt['users']:opt['users'].append(usr)
         self.usbox['values']=opt['users']
         opt['opt']['username']=usr
-        upopt(opt)
     def rmus(self):
         usr=self.usbox.get()
-        if usr:
-            if usr in opt['users']:opt['users'].remove(usr)
-            if opt['users']:self.usbox['text']=opt['users'][0]
-            self.setus()
+        if usr in opt['users']:opt['users'].remove(usr)
+        if opt['users']:
+            self.usbox['text']=opt['users'][0]
+            opt['opt']['username']=opt['users'][0]
+        else:self.usbox['text']=''
+        self.usbox['values']=opt['users']
+        self.setus()
     def gamelog(self,f=0,f1=0):
         if f:
             if f[0]==self.games:
