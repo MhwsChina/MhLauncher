@@ -9,6 +9,8 @@ from .mod import *
 from .xcdl import *
 rizhi='''=======更新日志=======
 源码:https://github.com/MhwsChina/MhLauncher
+v0.0.64
+修复了一些bug
 v0.0.63
 修复了一些bug
 v0.0.62
